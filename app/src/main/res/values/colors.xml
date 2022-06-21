@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="cor_laranja">#FC6E20</color>
+    <color name="cor_laranja_hint">#FC9157</color>
     <color name="cor_cinza">#E4E4E4</color>
     <color name="colorIconeOnBnv">#FC6E20</color>
     <color name="colorIconeOffBnv">#A59D98</color>

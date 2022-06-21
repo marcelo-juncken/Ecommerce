@@ -3,6 +3,7 @@ package com.example.ecommerce.helper;
 // https://www.youtube.com/watch?v=g6ySj807iTY
 // https://github.com/ravizworldz/Recyclerview_row_Drag_And_Drop/tree/main/app/src/main/java/com/android/fragmentrecyclerviewdemo
 
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -47,7 +48,6 @@ public class RecyclerRowMoveCallback extends ItemTouchHelper.Callback {
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
             touchHelperContract.onRowSelected(viewHolder);
         }
-
         super.onSelectedChanged(viewHolder, actionState);
     }
 
@@ -57,9 +57,9 @@ public class RecyclerRowMoveCallback extends ItemTouchHelper.Callback {
         touchHelperContract.onRowClear(viewHolder);
     }
 
+
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-
     }
 
     public interface RecyclerViewRowTouchHelperContract {

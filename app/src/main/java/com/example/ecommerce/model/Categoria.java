@@ -2,6 +2,7 @@ package com.example.ecommerce.model;
 
 import com.example.ecommerce.helper.FirebaseHelper;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.storage.StorageReference;
 
 public class Categoria {
     private String id;
@@ -13,6 +14,7 @@ public class Categoria {
     public Categoria() {
         DatabaseReference categoriaRef = FirebaseHelper.getDatabaseReference();
         this.setId(categoriaRef.push().getKey());
+        this.setPosicao(System.currentTimeMillis());
     }
 
     public void salvar() {
@@ -28,6 +30,12 @@ public class Categoria {
                 .child("categorias")
                 .child(this.getId());
         categoriaRef.removeValue();
+
+        StorageReference storageReference = FirebaseHelper.getStorageReference()
+                .child("imagens")
+                .child("categorias")
+                .child(getId() + ".jpeg");
+        storageReference.delete();
     }
 
     public long getPosicao() {

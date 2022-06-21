@@ -35,6 +35,7 @@ import com.example.ecommerce.databinding.SnackbarDeleteBinding;
 import com.example.ecommerce.helper.FirebaseHelper;
 import com.example.ecommerce.helper.RecyclerRowMoveCallback;
 import com.example.ecommerce.model.Categoria;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,6 +45,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.normal.TedPermission;
+import com.squareup.picasso.Picasso;
 import com.tsuryo.swipeablerv.SwipeLeftRightCallback;
 
 import java.io.IOException;
@@ -63,11 +65,12 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
 
     private Categoria categoria;
 
-    private List<Categoria> categoriaList = new ArrayList<>();
+    private final List<Categoria> categoriaList = new ArrayList<>();
     private AdapterCategoria adapterCategoria;
 
     private Snackbar snackbar;
 
+    private boolean novaCategoria;
 
 
     @Override
@@ -85,6 +88,7 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
         configCliques();
         configRV();
         recuperaCategorias();
+
     }
 
     private void recuperaCategorias() {
@@ -99,7 +103,7 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
                         categoriaList.add(ds.getValue(Categoria.class));
                     }
                     binding.txtInfo.setText("");
-                }else{
+                } else {
                     binding.txtInfo.setText("Nenhuma categoria cadastrada.");
                 }
                 binding.progressBar.setVisibility(View.GONE);
@@ -125,7 +129,6 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(binding.rvCategorias);
 
-
         binding.rvCategorias.setAdapter(adapterCategoria);
 
         binding.rvCategorias.setListener(new SwipeLeftRightCallback.Listener() {
@@ -134,18 +137,21 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
 
             }
 
+
             @Override
             public void onSwipedRight(int position) {
-                snackbarDeletaItem(categoriaList.get(position));
+                snackbarDeletaItem(categoriaList.get(position), position);
             }
         });
 
 
-
     }
+
     @Override
     public void onClick(Categoria categoria) {
-        Toast.makeText(getContext(), categoria.getNome(), Toast.LENGTH_SHORT).show();
+        this.categoria = categoria;
+        novaCategoria = false;
+        showDialog();
     }
 
     private void verificaPermissaoGaleria() {
@@ -179,13 +185,15 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
     }
 
     private void configCliques() {
-        binding.imbAdd.setOnClickListener(v -> showDialog());
+        binding.imbAdd.setOnClickListener(v -> {
+            novaCategoria = true;
+            showDialog();
+        });
     }
 
-    public void snackbarDeletaItem(Categoria categoria) {
-        // Create the Snackbar
-        LinearLayout.LayoutParams objLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        snackbar = Snackbar.make(binding.imbAdd, "", Snackbar.LENGTH_INDEFINITE);
+    public void snackbarDeletaItem(Categoria categoria, int posicao) {
+        LinearLayout.LayoutParams objLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        snackbar = Snackbar.make(binding.getRoot(), "", Snackbar.LENGTH_INDEFINITE).setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE);
         // Get the Snackbar's layout view
 
         Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
@@ -194,8 +202,12 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
 
         layout.setPadding(0, 0, 0, 0);
 
+
         // Inflate our custom view
         snackbarBinding = SnackbarDeleteBinding.inflate(LayoutInflater.from(getContext()));
+
+
+        objLayoutParams.setMargins(0, 0, 0, 0);
 
         snackbarBinding.txtCategoria.setText(categoria.getNome());
         // Configure our custom view
@@ -205,9 +217,11 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
         });
 
         snackbarBinding.btnSim.setOnClickListener(v -> {
+
+            snackbarBinding.progressBar.setVisibility(View.VISIBLE);
             categoria.deletar();
             categoriaList.remove(categoria);
-            adapterCategoria.notifyDataSetChanged();
+            adapterCategoria.notifyItemRemoved(posicao);
             if (categoriaList.isEmpty()) binding.txtInfo.setText("Nenhuma categoria cadastrada.");
             snackbar.dismiss();
         });
@@ -220,13 +234,19 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
 
     private void showDialog() {
 
-        caminhoImagem = null;
-
         AlertDialog.Builder builder = new AlertDialog.Builder(
                 getContext(), R.style.AlertDialog);
 
         categoriaBinding = DialogCategoriaFormBinding
                 .inflate(LayoutInflater.from(getContext()));
+
+        if (categoria != null && !novaCategoria) {
+            Picasso.get().load(categoria.getUrlImagem()).into(categoriaBinding.imgCategoria);
+            categoriaBinding.edtCategoria.setText(categoria.getNome());
+            categoriaBinding.cbTodos.setChecked(categoria.isTodas());
+        }
+        caminhoImagem = null;
+
 
         categoriaBinding.btnFechar.setOnClickListener(v -> {
             dialog.dismiss();
@@ -239,7 +259,7 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
         categoriaBinding.imgCategoria.setOnClickListener(v -> verificaPermissaoGaleria());
 
         builder.setView(categoriaBinding.getRoot());
-
+        builder.setCancelable(false);
         dialog = builder.create();
         dialog.show();
     }
@@ -247,18 +267,26 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
     private void validaDados() {
         String categoriaNome = categoriaBinding.edtCategoria.getText().toString().trim();
 
+        if (novaCategoria) categoria = new Categoria();
+
+        categoria.setNome(categoriaNome);
+
+        categoria.setTodas(categoriaBinding.cbTodos.isChecked());
+
         if (!categoriaNome.isEmpty()) {
             ocultarTeclado();
             if (caminhoImagem != null) {
-                categoriaBinding.progressBar.setVisibility(View.VISIBLE);
-                categoriaBinding.btnSalvar.setEnabled(false);
-                categoriaBinding.btnFechar.setEnabled(false);
-
-                if (categoria == null) categoria = new Categoria();
-                categoria.setNome(categoriaNome);
-                categoria.setTodas(categoriaBinding.cbTodos.isChecked());
-
+                statusButton();
                 salvaImagemFirebase();
+                if (novaCategoria) {
+                    categoriaList.add(0, categoria);
+                    binding.txtInfo.setText("");
+                }
+            } else if (!novaCategoria) {
+                statusButton();
+                categoria.salvar();
+                dialog.dismiss();
+                adapterCategoria.notifyDataSetChanged();
             } else {
                 Toast.makeText(requireContext(), "Escolha uma imagem para a categoria.", Toast.LENGTH_SHORT).show();
             }
@@ -266,6 +294,14 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
             categoriaBinding.edtCategoria.requestFocus();
             categoriaBinding.edtCategoria.setError("Esse campo não pode estar vazio.");
         }
+
+    }
+
+    private void statusButton() {
+            categoriaBinding.progressBar.setVisibility(View.VISIBLE);
+            categoriaBinding.btnSalvar.setEnabled(false);
+            categoriaBinding.btnFechar.setEnabled(false);
+            categoriaBinding.cbTodos.setEnabled(false);
     }
 
     private void salvaImagemFirebase() {
@@ -279,20 +315,11 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
             if (task.isSuccessful()) {
                 String urlImagem = task.getResult().toString();
                 categoria.setUrlImagem(urlImagem);
-                categoria.setPosicao(System.currentTimeMillis());
                 categoria.salvar();
-                categoriaList.add(0, categoria);
-                binding.txtInfo.setText("");
+
                 adapterCategoria.notifyDataSetChanged();
-
-                categoria = null;
-
                 dialog.dismiss();
-
             }
-            categoriaBinding.progressBar.setVisibility(View.GONE);
-            categoriaBinding.btnSalvar.setEnabled(true);
-            categoriaBinding.btnFechar.setEnabled(true);
 
         })).addOnFailureListener(e -> {
             Toast.makeText(getContext(), "Erro no upload da imagem, tente mais tarde.", Toast.LENGTH_SHORT).show();
@@ -302,6 +329,7 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
             categoriaBinding.btnFechar.setEnabled(true);
         });
     }
+
 
     private final ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),

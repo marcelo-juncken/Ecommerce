@@ -42,7 +42,7 @@ public class AdapterCategoria extends RecyclerView.Adapter<AdapterCategoria.MyVi
         holder.txtCategoria.setText(categoria.getNome());
         Picasso.get().load(categoria.getUrlImagem()).into(holder.imgCategoria);
 
-        holder.imgDrag.setOnClickListener(v -> onClickListener.onClick(categoria));
+        holder.itemView.setOnClickListener(v -> onClickListener.onClick(categoria));
 
     }
 
