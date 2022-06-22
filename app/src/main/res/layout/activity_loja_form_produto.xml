@@ -39,11 +39,11 @@
                     android:id="@+id/relativLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingEnd="4dp"
-                    android:paddingStart="0dp"
                     android:gravity="center"
-                    android:paddingTop="4dp">
+                    android:orientation="horizontal"
+                    android:paddingStart="0dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="4dp">
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cardViewAdd"
@@ -96,10 +96,78 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@android:color/transparent"
+                        android:hint="Título"
 
-                        android:hint="Título" />
+                        android:inputType="text" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <android.widget.Button
+                    android:id="@+id/btnCategoria"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/bg_borda_laranja"
+                    android:text="Selecione uma categoria" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="De:" />
+
+                        <com.blackcat.currencyedittext.CurrencyEditText
+                            android:id="@+id/edtValorAntigo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="-16dp"
+                            android:maxLength="15"
+                            android:inputType="numberDecimal"
+                            android:padding="16dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Para:" />
+
+                        <com.blackcat.currencyedittext.CurrencyEditText
+                            android:id="@+id/edtValorAtual"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxLength="15"
+                            android:inputType="numberDecimal"
+                            android:padding="16dp"
+                            android:layout_marginStart="-16dp" />
+
+                    </LinearLayout>
+
+
+
+
+                </LinearLayout>
 
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -119,66 +187,15 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="24dp"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal"
-                    android:weightSum="2">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:theme="@style/EditText">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtDe"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"
-                            android:hint="De R$" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:theme="@style/EditText">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtPor"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"
-                            android:hint="Por R$" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-
-                </LinearLayout>
-
-                <android.widget.Button
-                    android:id="@+id/btnCategoria"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="24dp"
-                    android:layout_marginTop="24dp"
-                    android:background="@drawable/bg_borda_laranja"
-                    android:text="Selecione uma categoria" />
-
                 <ProgressBar
-                    android:layout_marginTop="8dp"
                     android:id="@+id/progressBar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
                     android:indeterminateTint="@color/cor_laranja"
                     android:visibility="gone"
-                    tools:visibility="visible"/>
+                    tools:visibility="visible" />
 
                 <android.widget.Button
                     android:id="@+id/btnSalvar"
@@ -196,5 +213,8 @@
             </LinearLayout>
 
         </LinearLayout>
+
+
     </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

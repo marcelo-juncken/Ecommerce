@@ -12,6 +12,8 @@
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/bg_dialog.xml" value="0.251" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/bg_edit_off.xml" value="0.3175" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/bg_edit_on.xml" value="0.3175" />
+        <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/bg_strikethroughtext.xml" value="0.251" />
+        <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/bg_underlinetext.xml" value="0.251" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_add.xml" value="0.251" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_camera.xml" value="0.251" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_camera2.xml" value="0.251" />
@@ -63,6 +65,7 @@
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/ib_voltar.xml" value="0.365625" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/item_categoria_horizontal.xml" value="0.25" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/item_produto_foto.xml" value="0.3078947368421053" />
+        <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/item_produto_list.xml" value="0.3087719298245614" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/snackbar_delete.xml" value="0.3087719298245614" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/toolbar_voltar.xml" value="0.3087719298245614" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/toolbar_voltar_add.xml" value="0.3078947368421053" />

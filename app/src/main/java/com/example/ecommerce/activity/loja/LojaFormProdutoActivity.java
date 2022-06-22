@@ -1,13 +1,13 @@
 package com.example.ecommerce.activity.loja;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,8 +25,14 @@ import com.example.ecommerce.adapter.AdapterProdutoFotos;
 import com.example.ecommerce.databinding.ActivityLojaFormProdutoBinding;
 import com.example.ecommerce.databinding.BottomSheetDialogBinding;
 import com.example.ecommerce.helper.FirebaseHelper;
+import com.example.ecommerce.helper.GetMask;
+import com.example.ecommerce.model.ImagemUpload;
 import com.example.ecommerce.model.Produto;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.gun0912.tedpermission.PermissionListener;
@@ -35,8 +42,11 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LojaFormProdutoActivity extends AppCompatActivity implements AdapterProdutoFotos.OnClickListener {
 
@@ -45,17 +55,24 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     private String currentPhotoPath;
     private String caminho;
 
-    private List<String> listaImagens = new ArrayList<>();
-    private List<String> urlImagens = new ArrayList<>();
+    private final List<ImagemUpload> imagemUploadList = new ArrayList<>();
+    private final Map<String, ImagemUpload> imagemUploadMap = new HashMap<>();
+
+    private final List<ImagemUpload> imagemDeleteList = new ArrayList<>();
     private AdapterProdutoFotos adapterProdutoFotos;
 
-    private boolean isNew = true;
-
-    private int fotoPosition;
+    private boolean isNewImg = true;
 
     private Produto produto;
 
     private boolean adapterClickable = true;
+
+    private int editPosition;
+
+    private boolean hasNewImage = false;
+
+    public LojaFormProdutoActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +80,51 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         binding = ActivityLojaFormProdutoBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            String produtoId = (String) bundle.getSerializable("produtoSelecionado");
+            configProduto(produtoId);
+        }
+
         configCliques();
         configRV();
     }
+
+    private void configProduto(String produtoId) {
+
+        DatabaseReference produtosRef = FirebaseHelper.getDatabaseReference()
+                .child("produtos")
+                .child(produtoId);
+        produtosRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    produto = snapshot.getValue(Produto.class);
+                    configProduto();
+                } else {
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void configProduto() {
+        imagemUploadMap.putAll(produto.getImagemUploadMap());
+        imagemUploadList.addAll(produto.getImagemUploadMap().values());
+        Collections.sort(imagemUploadList, (o1, o2) -> Math.toIntExact(o1.getIndex() - o2.getIndex()));
+
+        binding.edtTitulo.setText(produto.getTitulo());
+        binding.edtDescricao.setText(produto.getDescricao());
+        binding.edtValorAntigo.setText(GetMask.getValor(produto.getValorAntigo()));
+        binding.edtValorAtual.setText(GetMask.getValor(produto.getValorAtual()));
+        adapterProdutoFotos.notifyDataSetChanged();
+    }
+
 
     private void bottomSheetDialog() {
 
@@ -98,8 +157,6 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
             public void onPermissionDenied(List<String> deniedPermissions) {
                 Toast.makeText(getBaseContext(), "Permissão negada", Toast.LENGTH_SHORT).show();
             }
-
-
         };
 
         showDialogPermissao(permissionlistener, new String[]{Manifest.permission.CAMERA}, "câmera");
@@ -159,8 +216,6 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
             public void onPermissionDenied(List<String> deniedPermissions) {
                 Toast.makeText(getBaseContext(), "Permissão negada", Toast.LENGTH_SHORT).show();
             }
-
-
         };
 
         showDialogPermissao(permissionlistener, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, "galeria");
@@ -180,7 +235,7 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     private void configCliques() {
         binding.include.include.ibVoltar.setOnClickListener(v -> finish());
         binding.cardViewAdd.setOnClickListener(v -> {
-            isNew = true;
+            isNewImg = true;
             bottomSheetDialog();
         });
         binding.btnSalvar.setOnClickListener(v -> validaDados());
@@ -189,22 +244,44 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     private void validaDados() {
         String titulo = binding.edtTitulo.getText().toString().trim();
         String descricao = binding.edtDescricao.getText().toString().trim();
-        String de = binding.edtDe.getText().toString().trim();
-        String por = binding.edtPor.getText().toString().trim();
+
+        double valorAntigo = 0;
+        double valorAtual = 0;
+
+        if (!binding.edtValorAntigo.getText().toString().isEmpty()) {
+            valorAntigo = (double) binding.edtValorAntigo.getRawValue() / 100;
+        }
+        if (!binding.edtValorAtual.getText().toString().isEmpty()) {
+            valorAtual = (double) binding.edtValorAtual.getRawValue() / 100;
+        }
 
         if (!titulo.isEmpty()) {
             if (!descricao.isEmpty()) {
-                if (!por.isEmpty()) {
-                    ocultarTeclado();
-                    if (produto == null) produto = new Produto();
+                if (valorAtual > 0) {
+                    if (valorAtual < valorAntigo) {
+                        ocultarTeclado();
 
-                    produto.setTitulo(titulo);
-                    produto.setDescricao(descricao);
-                    statusButton();
-                    salvaFotos();
+                        if (imagemUploadMap.isEmpty()) {
+                            showDialog();
+                        } else {
+                            if (produto == null) produto = new Produto();
+                            statusButton();
+                            produto.setTitulo(titulo);
+                            produto.setDescricao(descricao);
+                            produto.setValorAtual(valorAtual);
+                            produto.setValorAntigo(valorAntigo);
+                            produto.salvar();
+
+                            deletarImagens(this::salvarFotos);
+                        }
+                    } else {
+                        binding.edtValorAntigo.requestFocus();
+                        binding.edtValorAtual.setError("O valor atual tem que ser menor que o valor antigo.");
+                        binding.edtValorAtual.setError("O valor atual tem que ser menor que o valor antigo.");
+                    }
                 } else {
-                    binding.edtPor.requestFocus();
-                    binding.edtPor.setError("Esse campo não pode estar em branco");
+                    binding.edtValorAtual.requestFocus();
+                    binding.edtValorAtual.setError("Esse campo não pode estar em branco");
                 }
             } else {
                 binding.edtDescricao.requestFocus();
@@ -216,34 +293,73 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         }
     }
 
-    private void salvaFotos() {
-        for (int i = 0; i < listaImagens.size(); i++) {
-            StorageReference storageReference = FirebaseHelper.getStorageReference()
-                    .child("imagens")
-                    .child("produtos")
-                    .child(produto.getId())
-                    .child("imagem_" + i + ".jpeg");
-
-            UploadTask uploadTask = storageReference.putFile(Uri.parse(listaImagens.get(i)));
-            uploadTask.addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    String urlImagem = task.getResult().toString();
-                    urlImagens.add(urlImagem);
-                    Log.d("DEBUGFOTO", "salvaFotos: " + urlImagem + " - " + urlImagens.get(0));
-
-
-                    if (urlImagens.size() == listaImagens.size()) {
-                        produto.setImagensUrl(urlImagens);
-                        produto.salvar();
-                        finish();
-                    }
-                }
-            })).addOnFailureListener(e -> Toast.makeText(this, "Falha no upload, tente mais tarde", Toast.LENGTH_SHORT).show());
-        }
-
-
+    public interface MyCallback {
+        void onCallback();
     }
 
+    public void deletarImagens(MyCallback myCallback) {
+        if (!imagemDeleteList.isEmpty()) {
+            for (int i = 0; i < imagemDeleteList.size(); i++) {
+                StorageReference storageReference = FirebaseHelper.getStorageReference()
+                        .child("imagens")
+                        .child("produtos")
+                        .child(produto.getId())
+                        .child(imagemDeleteList.get(i).getIndex() + ".jpeg");
+                int finalI = i;
+                storageReference.delete().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference()
+                                .child("produtos")
+                                .child(produto.getId())
+                                .child("imagemUploadMap")
+                                .child(String.valueOf(imagemDeleteList.get(finalI).getIndex()));
+                        produtoRef.removeValue();
+
+                        if(finalI + 1 == imagemDeleteList.size()) {
+                            myCallback.onCallback();
+                        }
+                    }
+                });
+
+            }
+        } else {
+            salvarFotos();
+        }
+    }
+
+    private void salvarFotos() {
+        if (hasNewImage) {
+            for (int i = 0; i < imagemUploadList.size(); i++) {
+
+                ImagemUpload imagemUpload = imagemUploadList.get(i);
+                if (!imagemUpload.getCaminhoImagem().contains("firebasestorage")) {
+                    StorageReference storageReference = FirebaseHelper.getStorageReference()
+                            .child("imagens")
+                            .child("produtos")
+                            .child(produto.getId())
+                            .child(imagemUploadList.get(i).getIndex() + ".jpeg");
+
+                    UploadTask uploadTask = storageReference.putFile(Uri.parse(imagemUpload.getCaminhoImagem()));
+                    int finalI = i;
+                    uploadTask.addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+
+                            imagemUpload.setCaminhoImagem(task.getResult().toString());
+                            imagemUploadMap.put(String.valueOf(imagemUpload.getIndex()), imagemUpload);
+
+                            produto.salvarImagem(imagemUpload);
+
+                            if (finalI + 1 == imagemUploadList.size()) {
+                                finish();
+                            }
+                        }
+                    })).addOnFailureListener(e -> Toast.makeText(this, "Falha no upload, tente mais tarde", Toast.LENGTH_SHORT).show());
+                }
+            }
+        } else {
+            finish();
+        }
+    }
 
     private final ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -251,29 +367,48 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
                 if (result.getResultCode() == RESULT_OK) {
                     if (result.getData() != null) {
 
-                        String caminhoImagem;
+                        String caminhoImagem = "";
                         if (caminho.equals("Galeria")) {
                             Uri localImagemSelecionada = result.getData().getData();
                             caminhoImagem = localImagemSelecionada.toString();
-                            if (isNew) {
-                                listaImagens.add(0,caminhoImagem);
-                            } else {
-                                listaImagens.set(fotoPosition, caminhoImagem);
-                            }
+
                         } else if (caminho.equals("Camera")) {
                             File file = new File(currentPhotoPath);
                             caminhoImagem = String.valueOf(file.toURI());
-                            if (isNew) {
-                                listaImagens.add(0,caminhoImagem);
-                            } else {
-                                listaImagens.set(fotoPosition, caminhoImagem);
-                            }
                         }
-                        adapterProdutoFotos.notifyDataSetChanged();
+                        hasNewImage = true;
+
+                        if (isNewImg) {
+                            ImagemUpload imagemUpload = new ImagemUpload(caminhoImagem);
+                            imagemUploadMap.put(String.valueOf(imagemUpload.getIndex()), imagemUpload);
+                            imagemUploadList.add(imagemUpload);
+                        } else {
+                            ImagemUpload imagemUpload = imagemUploadList.get(editPosition);
+
+                            imagemUpload.setCaminhoImagem(caminhoImagem);
+                            imagemUploadMap.put(String.valueOf(imagemUpload.getIndex()), imagemUpload);
+                            imagemUploadList.get(editPosition).setCaminhoImagem(caminhoImagem);
+                        }
                     }
+                    adapterProdutoFotos.notifyDataSetChanged();
                 }
             }
+
     );
+
+    private void showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                this);
+
+        builder.setCancelable(false);
+        builder.setMessage("É necessário ter pelo menos uma imagem para o produto.");
+        builder.setNegativeButton("Fechar", (dialog, which) -> {
+            dialog.dismiss();
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 
     private void statusButton() {
         binding.progressBar.setVisibility(View.VISIBLE);
@@ -285,14 +420,14 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
 
     private void ocultarTeclado() {
         ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(
-                binding.edtPor.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS
+                binding.edtValorAtual.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS
         );
     }
 
     private void configRV() {
         binding.rvFotosItens.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.rvFotosItens.setHasFixedSize(true);
-        adapterProdutoFotos = new AdapterProdutoFotos(listaImagens, this, getBaseContext());
+        adapterProdutoFotos = new AdapterProdutoFotos(this, imagemUploadList);
         binding.rvFotosItens.setAdapter(adapterProdutoFotos);
     }
 
@@ -300,12 +435,15 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     @Override
     public void onClick(int position, boolean isEditing) {
         if (adapterClickable) {
-            if(isEditing) {
-                this.fotoPosition = position;
-                isNew = false;
+            if (isEditing) {
+                editPosition = position;
+                isNewImg = false;
                 bottomSheetDialog();
-            }else{
-                listaImagens.remove(position);
+            } else {
+                ImagemUpload imagemUpload = imagemUploadList.get(position);
+                imagemDeleteList.add(imagemUpload);
+                imagemUploadMap.remove(String.valueOf(imagemUpload.getIndex()));
+                imagemUploadList.remove(imagemUpload);
                 adapterProdutoFotos.notifyDataSetChanged();
             }
         }

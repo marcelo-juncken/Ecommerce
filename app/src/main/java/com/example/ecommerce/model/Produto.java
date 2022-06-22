@@ -2,17 +2,25 @@ package com.example.ecommerce.model;
 
 import com.example.ecommerce.helper.FirebaseHelper;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class Produto {
+public class Produto implements Serializable {
     private String id;
-    private List<String> imagensUrl;
+    private int idLocal;
+    private Map<String, ImagemUpload> imagemUploadMap;
     private String titulo;
     private String descricao;
-    private double de;
-    private double por;
-    private List<Categoria> categoriaList;
+    private double valorAntigo;
+    private double valorAtual;
+    private List<String> idCategorias;
 
     public Produto() {
         DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference();
@@ -23,8 +31,23 @@ public class Produto {
     public void salvar() {
         DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference()
                 .child("produtos")
-                .child(getId());
+                .child(this.getId());
         produtoRef.setValue(this);
+    }
+
+    public void salvarImagem(ImagemUpload imagemUpload) {
+        DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference()
+                .child("produtos")
+                .child(this.getId())
+                .child("imagemUploadMap")
+                .child(String.valueOf(imagemUpload.getIndex()));
+        produtoRef.child("index").setValue(imagemUpload.getIndex());
+        produtoRef.child("caminhoImagem").setValue(imagemUpload.getCaminhoImagem());
+    }
+
+    public void deletar(ImagemUpload imagemDelete) {
+
+
     }
 
     public String getId() {
@@ -35,13 +58,22 @@ public class Produto {
         this.id = id;
     }
 
-    public List<String> getImagensUrl() {
-        return imagensUrl;
+    @Exclude
+    public int getIdLocal() {
+        return idLocal;
+    }
+
+    public void setIdLocal(int idLocal) {
+        this.idLocal = idLocal;
     }
 
 
-    public void setImagensUrl(List<String> imagensUrl) {
-        this.imagensUrl = imagensUrl;
+    public Map<String, ImagemUpload> getImagemUploadMap() {
+        return imagemUploadMap;
+    }
+
+    public void setImagemUploadMap(Map<String, ImagemUpload> imagemUploadMap) {
+        this.imagemUploadMap = imagemUploadMap;
     }
 
     public String getTitulo() {
@@ -60,29 +92,27 @@ public class Produto {
         this.descricao = descricao;
     }
 
-    public double getDe() {
-        return de;
+    public double getValorAntigo() {
+        return valorAntigo;
     }
 
-    public void setDe(double de) {
-        this.de = de;
+    public void setValorAntigo(double valorAntigo) {
+        this.valorAntigo = valorAntigo;
     }
 
-    public double getPor() {
-        return por;
+    public double getValorAtual() {
+        return valorAtual;
     }
 
-    public void setPor(double por) {
-        this.por = por;
+    public void setValorAtual(double valorAtual) {
+        this.valorAtual = valorAtual;
     }
 
-    public List<Categoria> getCategoriaList() {
-        return categoriaList;
+    public List<String> getIdCategorias() {
+        return idCategorias;
     }
 
-    public void setCategoriaList(List<Categoria> categoriaList) {
-        this.categoriaList = categoriaList;
+    public void setIdCategorias(List<String> idCategorias) {
+        this.idCategorias = idCategorias;
     }
-
-
 }

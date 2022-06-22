@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,60 +17,48 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ecommerce.R;
+import com.example.ecommerce.model.ImagemUpload;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AdapterProdutoFotos extends RecyclerView.Adapter<AdapterProdutoFotos.MyViewHolder> {
 
-    private List<String> fotosList;
-    private OnClickListener onClickListener;
-    private Context context;
+    private final OnClickListener onClickListener;
+    private List<ImagemUpload> imagemUploadList = new ArrayList<>();
 
-    public AdapterProdutoFotos(List<String> fotosList, OnClickListener onClickListener, Context context) {
-        this.fotosList = fotosList;
+    public AdapterProdutoFotos(OnClickListener onClickListener, List<ImagemUpload> imagemUploadList) {
         this.onClickListener = onClickListener;
-        this.context = context;
+        this.imagemUploadList = imagemUploadList;
     }
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_produto_foto,parent , false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_produto_foto, parent, false);
         return new MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        String fotoPosition = fotosList.get(position);
+        ImagemUpload imagemUpload = imagemUploadList.get(position);
 
-        holder.imgFoto.setImageBitmap(getBitmap(Uri.parse(fotoPosition)));
-        holder.cardView.setOnClickListener(v -> onClickListener.onClick(position,true));
-        holder.imgDelete.setOnClickListener(v -> onClickListener.onClick(position,false));
+        Picasso.get().load(imagemUpload.getCaminhoImagem()).into(holder.imgFoto);
+        holder.cardView.setOnClickListener(v -> onClickListener.onClick(position, true));
+        holder.imgDelete.setOnClickListener(v -> onClickListener.onClick(position, false));
     }
 
-    private Bitmap getBitmap(Uri caminhoUri) {
-        Bitmap bitmap = null;
-        try {
-            if (Build.VERSION.SDK_INT < 31) {
-                bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), caminhoUri);
-            } else {
-                ImageDecoder.Source source = ImageDecoder.createSource(context.getContentResolver(), caminhoUri);
-                bitmap = ImageDecoder.decodeBitmap(source);
-            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return bitmap;
-    }
     @Override
     public int getItemCount() {
-        return fotosList.size();
+        return imagemUploadList.size();
     }
 
-    public interface OnClickListener{
+    public interface OnClickListener {
         void onClick(int position, boolean isEditing);
     }
 
@@ -77,6 +66,7 @@ public class AdapterProdutoFotos extends RecyclerView.Adapter<AdapterProdutoFoto
         ImageView imgFoto;
         ImageView imgDelete;
         CardView cardView;
+
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             imgFoto = itemView.findViewById(R.id.imgFoto);
