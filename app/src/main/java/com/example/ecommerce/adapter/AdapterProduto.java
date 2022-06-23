@@ -1,6 +1,7 @@
 package com.example.ecommerce.adapter;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ecommerce.R;
-import com.example.ecommerce.databinding.ItemProdutoListBinding;
 import com.example.ecommerce.helper.GetMask;
 import com.example.ecommerce.model.ImagemUpload;
 import com.example.ecommerce.model.Produto;
@@ -26,8 +26,6 @@ public class AdapterProduto extends RecyclerView.Adapter<AdapterProduto.MyViewHo
     private final List<Produto> produtoList;
     private final Context context;
     private final onClickListener onClickListener;
-
-    // private ItemProdutoListBinding binding;
 
     public AdapterProduto(List<Produto> produtoList, Context context, AdapterProduto.onClickListener onClickListener) {
         this.produtoList = produtoList;
@@ -51,13 +49,15 @@ public class AdapterProduto extends RecyclerView.Adapter<AdapterProduto.MyViewHo
 
         Picasso.get().load(imagemUploadList.get(0).getCaminhoImagem()).error(R.drawable.ic_close).into(holder.imgProduto);
         holder.txtTitulo.setText(produto.getTitulo());
-        holder.txtDescricao.setText(produto.getDescricao());
 
         if (produto.getValorAntigo() > 0) {
-            holder.txtValorAntigo.setText(context.getString(R.string.valor_produto, GetMask.getValor(produto.getValorAntigo())));
+
+            int valor = (int) (Math.ceil((1 - (produto.getValorAtual() / produto.getValorAntigo())) * 100));
+            holder.txtDescontoProduto.setText(String.format("%s%% OFF", valor));
+            holder.txtDescontoProduto.setPaintFlags(holder.txtDescontoProduto.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         }
 
-        holder.txtValorAtual.setText(context.getString(R.string.valor_striked, GetMask.getValor(produto.getValorAtual())));
+        holder.txtValorAtual.setText(context.getString(R.string.valor_produto, GetMask.getValor(produto.getValorAtual())));
 
         holder.itemView.setOnClickListener(v -> onClickListener.onClicK(produto));
     }
@@ -75,15 +75,14 @@ public class AdapterProduto extends RecyclerView.Adapter<AdapterProduto.MyViewHo
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
         ImageView imgProduto;
-        TextView txtTitulo, txtDescricao, txtValorAtual, txtValorAntigo;
+        TextView txtTitulo, txtValorAtual, txtDescontoProduto;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             imgProduto = itemView.findViewById(R.id.imgProduto);
             txtTitulo = itemView.findViewById(R.id.txtTitulo);
-            txtDescricao = itemView.findViewById(R.id.txtDescricao);
             txtValorAtual = itemView.findViewById(R.id.txtValorAtual);
-            txtValorAntigo = itemView.findViewById(R.id.txtValorAntigo);
+            txtDescontoProduto = itemView.findViewById(R.id.txtDescontoProduto);
         }
     }
 }

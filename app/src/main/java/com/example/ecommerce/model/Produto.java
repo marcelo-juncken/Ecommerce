@@ -45,10 +45,6 @@ public class Produto implements Serializable {
         produtoRef.child("caminhoImagem").setValue(imagemUpload.getCaminhoImagem());
     }
 
-    public void deletar(ImagemUpload imagemDelete) {
-
-
-    }
 
     public String getId() {
         return id;

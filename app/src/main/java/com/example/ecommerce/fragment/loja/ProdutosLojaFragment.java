@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
@@ -79,7 +80,7 @@ public class ProdutosLojaFragment extends Fragment implements AdapterProduto.onC
     }
 
     private void configRV() {
-        binding.rvProdutos.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvProdutos.setLayoutManager(new GridLayoutManager(requireContext(),2));
         binding.rvProdutos.setHasFixedSize(true);
         adapterProduto = new AdapterProduto(produtoList, getContext(), this);
         binding.rvProdutos.setAdapter(adapterProduto);

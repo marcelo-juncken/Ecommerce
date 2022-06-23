@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -21,11 +23,15 @@ import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.ecommerce.R;
+import com.example.ecommerce.adapter.AdapterCategoriaDialog;
 import com.example.ecommerce.adapter.AdapterProdutoFotos;
 import com.example.ecommerce.databinding.ActivityLojaFormProdutoBinding;
 import com.example.ecommerce.databinding.BottomSheetDialogBinding;
+
+import com.example.ecommerce.databinding.DialogFormProdutoCategoriaBinding;
 import com.example.ecommerce.helper.FirebaseHelper;
 import com.example.ecommerce.helper.GetMask;
+import com.example.ecommerce.model.Categoria;
 import com.example.ecommerce.model.ImagemUpload;
 import com.example.ecommerce.model.Produto;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -46,9 +52,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-public class LojaFormProdutoActivity extends AppCompatActivity implements AdapterProdutoFotos.OnClickListener {
+public class LojaFormProdutoActivity extends AppCompatActivity implements AdapterProdutoFotos.OnClickListener, AdapterCategoriaDialog.onClickListener {
 
     private ActivityLojaFormProdutoBinding binding;
 
@@ -71,8 +78,17 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
 
     private boolean hasNewImage = false;
 
-    public LojaFormProdutoActivity() {
-    }
+    private DialogFormProdutoCategoriaBinding bindingDialogCategoria;
+
+    private AdapterCategoriaDialog adapterCategoriaDialog;
+    private List<Categoria> categoriaList = new ArrayList<>();
+    private List<String> categoriasSelecionadasList = new ArrayList<>();
+    private List<String> idsCategoriasSelecionadasList = new ArrayList<>();
+    private List<String> categoriasSelecionadasTempList = new ArrayList<>();
+    private List<String> idsCategoriasSelecionadasTempList = new ArrayList<>();
+
+
+    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,18 +96,26 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         binding = ActivityLojaFormProdutoBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        binding.edtValorAtual.setLocale(new Locale("PT", "br"));
+        binding.edtValorAntigo.setLocale(new Locale("PT", "br"));
+        recuperaCategorias();
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
+            binding.include.txtTitulo.setText("Editar produto");
             String produtoId = (String) bundle.getSerializable("produtoSelecionado");
-            configProduto(produtoId);
+            recuperaProduto(produtoId);
+        } else {
+            binding.include.txtTitulo.setText("Novo produto");
+            binding.progressBar.setVisibility(View.GONE);
         }
 
+
         configCliques();
-        configRV();
+        configRVFotos();
     }
 
-    private void configProduto(String produtoId) {
-
+    private void recuperaProduto(String produtoId) {
         DatabaseReference produtosRef = FirebaseHelper.getDatabaseReference()
                 .child("produtos")
                 .child(produtoId);
@@ -113,7 +137,28 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         });
     }
 
+    private void recuperaCategorias() {
+        DatabaseReference produtosRef = FirebaseHelper.getDatabaseReference()
+                .child("categorias");
+        produtosRef.orderByChild("posicao").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        categoriaList.add(ds.getValue(Categoria.class));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void configProduto() {
+
         imagemUploadMap.putAll(produto.getImagemUploadMap());
         imagemUploadList.addAll(produto.getImagemUploadMap().values());
         Collections.sort(imagemUploadList, (o1, o2) -> Math.toIntExact(o1.getIndex() - o2.getIndex()));
@@ -122,7 +167,19 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         binding.edtDescricao.setText(produto.getDescricao());
         binding.edtValorAntigo.setText(GetMask.getValor(produto.getValorAntigo()));
         binding.edtValorAtual.setText(GetMask.getValor(produto.getValorAtual()));
+
+        idsCategoriasSelecionadasList.addAll(produto.getIdCategorias());
+        for (Categoria categoria : categoriaList) {
+            if (produto.getIdCategorias().contains(categoria.getId())) {
+                categoriasSelecionadasList.add(categoria.getNome());
+            }
+        }
+
+        binding.btnCategoria.setText(TextUtils.join(", ", categoriasSelecionadasList));
         adapterProdutoFotos.notifyDataSetChanged();
+
+        binding.progressBar.setVisibility(View.GONE);
+
     }
 
 
@@ -176,6 +233,45 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+    private void showDialogCategorias() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
+        bindingDialogCategoria = DialogFormProdutoCategoriaBinding
+                .inflate(LayoutInflater.from(this));
+
+        configRVCategorias();
+        bindingDialogCategoria.btnFechar.setOnClickListener(v -> {
+
+            adapterCategoriaDialog.notifyDataSetChanged();
+            dialog.dismiss();
+        });
+        bindingDialogCategoria.btnSalvar.setOnClickListener(v -> {
+
+            idsCategoriasSelecionadasList = new ArrayList<>(idsCategoriasSelecionadasTempList);
+            categoriasSelecionadasList = new ArrayList<>(categoriasSelecionadasTempList);
+            binding.btnCategoria.setText(TextUtils.join(", ", categoriasSelecionadasList));
+
+            if (!idsCategoriasSelecionadasList.isEmpty()) {
+                binding.btnCategoria.setError(null);
+            } else {
+                binding.btnCategoria.setError("");
+            }
+            adapterCategoriaDialog.notifyDataSetChanged();
+            dialog.dismiss();
+        });
+
+        if (categoriaList.isEmpty()) {
+            bindingDialogCategoria.txtInfo.setText("Nenhuma categoria cadastrada.");
+        } else {
+            bindingDialogCategoria.txtInfo.setText("");
+        }
+        bindingDialogCategoria.progressBar.setVisibility(View.GONE);
+
+        builder.setView(bindingDialogCategoria.getRoot());
+
+        dialog = builder.create();
+        dialog.show();
     }
 
     private void abreCamera() {
@@ -239,53 +335,58 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
             bottomSheetDialog();
         });
         binding.btnSalvar.setOnClickListener(v -> validaDados());
+
+        binding.btnCategoria.setOnClickListener(v -> {
+            idsCategoriasSelecionadasTempList = new ArrayList<>(idsCategoriasSelecionadasList);
+            categoriasSelecionadasTempList = new ArrayList<>(categoriasSelecionadasList);
+            showDialogCategorias();
+        });
     }
 
     private void validaDados() {
         String titulo = binding.edtTitulo.getText().toString().trim();
         String descricao = binding.edtDescricao.getText().toString().trim();
 
-        double valorAntigo = 0;
-        double valorAtual = 0;
-
-        if (!binding.edtValorAntigo.getText().toString().isEmpty()) {
-            valorAntigo = (double) binding.edtValorAntigo.getRawValue() / 100;
-        }
-        if (!binding.edtValorAtual.getText().toString().isEmpty()) {
-            valorAtual = (double) binding.edtValorAtual.getRawValue() / 100;
-        }
+        double valorAntigo = (double) binding.edtValorAntigo.getRawValue() / 100;
+        double valorAtual = (double) binding.edtValorAtual.getRawValue() / 100;
 
         if (!titulo.isEmpty()) {
-            if (!descricao.isEmpty()) {
-                if (valorAtual > 0) {
-                    if (valorAtual < valorAntigo) {
-                        ocultarTeclado();
+            if (!idsCategoriasSelecionadasList.isEmpty()) {
+                binding.btnCategoria.setError(null);
+                if (!descricao.isEmpty()) {
+                    if (valorAtual > 0) {
+                        if (valorAtual < valorAntigo || valorAntigo == 0) {
+                            ocultarTeclado();
 
-                        if (imagemUploadMap.isEmpty()) {
-                            showDialog();
+                            if (imagemUploadMap.isEmpty()) {
+                                showDialog();
+                            } else {
+                                if (produto == null) produto = new Produto();
+                                statusButton();
+                                produto.setTitulo(titulo);
+                                produto.setDescricao(descricao);
+                                produto.setValorAtual(valorAtual);
+                                produto.setValorAntigo(valorAntigo);
+                                produto.setIdCategorias(idsCategoriasSelecionadasList);
+                                produto.salvar();
+
+                                deletarImagens(this::salvarFotos);
+                            }
                         } else {
-                            if (produto == null) produto = new Produto();
-                            statusButton();
-                            produto.setTitulo(titulo);
-                            produto.setDescricao(descricao);
-                            produto.setValorAtual(valorAtual);
-                            produto.setValorAntigo(valorAntigo);
-                            produto.salvar();
-
-                            deletarImagens(this::salvarFotos);
+                            binding.edtValorAntigo.requestFocus();
+                            binding.edtValorAtual.setError("O valor atual tem que ser menor que o valor antigo.");
+                            binding.edtValorAtual.setError("O valor atual tem que ser menor que o valor antigo.");
                         }
                     } else {
-                        binding.edtValorAntigo.requestFocus();
-                        binding.edtValorAtual.setError("O valor atual tem que ser menor que o valor antigo.");
-                        binding.edtValorAtual.setError("O valor atual tem que ser menor que o valor antigo.");
+                        binding.edtValorAtual.requestFocus();
+                        binding.edtValorAtual.setError("Esse campo não pode estar em branco");
                     }
                 } else {
-                    binding.edtValorAtual.requestFocus();
-                    binding.edtValorAtual.setError("Esse campo não pode estar em branco");
+                    binding.edtDescricao.requestFocus();
+                    binding.edtDescricao.setError("Esse campo não pode estar em branco");
                 }
             } else {
-                binding.edtDescricao.requestFocus();
-                binding.edtDescricao.setError("Esse campo não pode estar em branco");
+                binding.btnCategoria.setError("Esse campo não pode estar em branco");
             }
         } else {
             binding.edtTitulo.requestFocus();
@@ -315,7 +416,7 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
                                 .child(String.valueOf(imagemDeleteList.get(finalI).getIndex()));
                         produtoRef.removeValue();
 
-                        if(finalI + 1 == imagemDeleteList.size()) {
+                        if (finalI + 1 == imagemDeleteList.size()) {
                             myCallback.onCallback();
                         }
                     }
@@ -330,7 +431,6 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     private void salvarFotos() {
         if (hasNewImage) {
             for (int i = 0; i < imagemUploadList.size(); i++) {
-
                 ImagemUpload imagemUpload = imagemUploadList.get(i);
                 if (!imagemUpload.getCaminhoImagem().contains("firebasestorage")) {
                     StorageReference storageReference = FirebaseHelper.getStorageReference()
@@ -393,7 +493,6 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
                     adapterProdutoFotos.notifyDataSetChanged();
                 }
             }
-
     );
 
     private void showDialog() {
@@ -409,7 +508,6 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         dialog.show();
     }
 
-
     private void statusButton() {
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.btnSalvar.setEnabled(false);
@@ -424,13 +522,19 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         );
     }
 
-    private void configRV() {
+    private void configRVFotos() {
         binding.rvFotosItens.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.rvFotosItens.setHasFixedSize(true);
         adapterProdutoFotos = new AdapterProdutoFotos(this, imagemUploadList);
         binding.rvFotosItens.setAdapter(adapterProdutoFotos);
     }
 
+    private void configRVCategorias() {
+        bindingDialogCategoria.rvCategorias.setLayoutManager(new LinearLayoutManager(this));
+        bindingDialogCategoria.rvCategorias.setHasFixedSize(true);
+        adapterCategoriaDialog = new AdapterCategoriaDialog(categoriaList, this, idsCategoriasSelecionadasList);
+        bindingDialogCategoria.rvCategorias.setAdapter(adapterCategoriaDialog);
+    }
 
     @Override
     public void onClick(int position, boolean isEditing) {
@@ -448,4 +552,18 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
             }
         }
     }
+
+
+    @Override
+    public void onClick(Categoria categoria) {
+        if (idsCategoriasSelecionadasTempList.contains(categoria.getId())) {
+
+            idsCategoriasSelecionadasTempList.remove(categoria.getId());
+            categoriasSelecionadasTempList.remove(categoria.getNome());
+        } else {
+            idsCategoriasSelecionadasTempList.add(categoria.getId());
+            categoriasSelecionadasTempList.add(categoria.getNome());
+        }
+    }
+
 }

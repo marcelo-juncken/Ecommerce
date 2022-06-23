@@ -29,7 +29,7 @@ import java.util.Set;
 public class AdapterProdutoFotos extends RecyclerView.Adapter<AdapterProdutoFotos.MyViewHolder> {
 
     private final OnClickListener onClickListener;
-    private List<ImagemUpload> imagemUploadList = new ArrayList<>();
+    private List<ImagemUpload> imagemUploadList;
 
     public AdapterProdutoFotos(OnClickListener onClickListener, List<ImagemUpload> imagemUploadList) {
         this.onClickListener = onClickListener;
@@ -47,7 +47,7 @@ public class AdapterProdutoFotos extends RecyclerView.Adapter<AdapterProdutoFoto
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         ImagemUpload imagemUpload = imagemUploadList.get(position);
 
-        Picasso.get().load(imagemUpload.getCaminhoImagem()).into(holder.imgFoto);
+        Picasso.get().load(imagemUpload.getCaminhoImagem()).placeholder(R.drawable.ic_loadinggif).into(holder.imgFoto);
         holder.cardView.setOnClickListener(v -> onClickListener.onClick(position, true));
         holder.imgDelete.setOnClickListener(v -> onClickListener.onClick(position, false));
     }
