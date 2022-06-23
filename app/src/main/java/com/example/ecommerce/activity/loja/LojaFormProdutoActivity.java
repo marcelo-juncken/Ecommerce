@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -62,6 +63,7 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     private String caminho;
 
     private final List<ImagemUpload> imagemUploadList = new ArrayList<>();
+    private final List<ImagemUpload> imagemAddList = new ArrayList<>();
     private final Map<String, ImagemUpload> imagemUploadMap = new HashMap<>();
 
     private final List<ImagemUpload> imagemDeleteList = new ArrayList<>();
@@ -74,8 +76,6 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     private boolean adapterClickable = true;
 
     private int editPosition;
-
-    private boolean hasNewImage = false;
 
     private DialogFormProdutoCategoriaBinding bindingDialogCategoria;
 
@@ -417,6 +417,7 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
                             .child("imagemUploadMap")
                             .child(String.valueOf(imagemDeleteList.get(finalI).getIndex()));
                     produtoRef.removeValue().addOnCompleteListener(task1 -> {
+
                         if (finalI + 1 == imagemDeleteList.size()) {
                             myCallback.onCallback();
                         }
@@ -431,15 +432,15 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     }
 
     private void salvarFotos() {
-        if (hasNewImage) {
-            for (int i = 0; i < imagemUploadList.size(); i++) {
-                ImagemUpload imagemUpload = imagemUploadList.get(i);
-                if (!imagemUpload.getCaminhoImagem().contains("firebasestorage")) {
+        if (!imagemAddList.isEmpty()) {
+            for (int i = 0; i < imagemAddList.size(); i++) {
+                ImagemUpload imagemUpload = imagemAddList.get(i);
+
                     StorageReference storageReference = FirebaseHelper.getStorageReference()
                             .child("imagens")
                             .child("produtos")
                             .child(produto.getId())
-                            .child(imagemUploadList.get(i).getIndex() + ".jpeg");
+                            .child(imagemAddList.get(i).getIndex() + ".jpeg");
 
                     UploadTask uploadTask = storageReference.putFile(Uri.parse(imagemUpload.getCaminhoImagem()));
                     int finalI = i;
@@ -451,12 +452,11 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
 
                             produto.salvarImagem(imagemUpload);
 
-                            if (finalI + 1 == imagemUploadList.size()) {
+                            if (finalI + 1 == imagemAddList.size()) {
                                 finish();
                             }
                         }
                     })).addOnFailureListener(e -> Toast.makeText(this, "Falha no upload, tente mais tarde", Toast.LENGTH_SHORT).show());
-                }
             }
         } else {
             finish();
@@ -478,19 +478,21 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
                             File file = new File(currentPhotoPath);
                             caminhoImagem = String.valueOf(file.toURI());
                         }
-                        hasNewImage = true;
 
+                        ImagemUpload imagemUpload;
                         if (isNewImg) {
-                            ImagemUpload imagemUpload = new ImagemUpload(caminhoImagem);
+                            imagemUpload = new ImagemUpload(caminhoImagem);
                             imagemUploadMap.put(String.valueOf(imagemUpload.getIndex()), imagemUpload);
                             imagemUploadList.add(imagemUpload);
                         } else {
-                            ImagemUpload imagemUpload = imagemUploadList.get(editPosition);
+                            imagemUpload = imagemUploadList.get(editPosition);
 
                             imagemUpload.setCaminhoImagem(caminhoImagem);
                             imagemUploadMap.put(String.valueOf(imagemUpload.getIndex()), imagemUpload);
                             imagemUploadList.get(editPosition).setCaminhoImagem(caminhoImagem);
                         }
+                        imagemAddList.add(imagemUpload);
+
                     }
                     adapterProdutoFotos.notifyDataSetChanged();
                 }
@@ -547,9 +549,14 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
                 bottomSheetDialog();
             } else {
                 ImagemUpload imagemUpload = imagemUploadList.get(position);
-                imagemDeleteList.add(imagemUpload);
+                if(!imagemAddList.contains(imagemUpload)){
+                    imagemDeleteList.add(imagemUpload);
+                } else {
+                    imagemAddList.remove(imagemUpload);
+                }
                 imagemUploadMap.remove(String.valueOf(imagemUpload.getIndex()));
                 imagemUploadList.remove(imagemUpload);
+
                 adapterProdutoFotos.notifyDataSetChanged();
             }
         }

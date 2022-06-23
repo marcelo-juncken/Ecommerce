@@ -76,7 +76,7 @@ public class ProdutosLojaFragment extends Fragment implements AdapterProduto.onC
                 produtoList.clear();
                 if (snapshot.exists()) {
                     for (DataSnapshot ds : snapshot.getChildren()) {
-                        produtoList.add(ds.getValue(Produto.class));
+                        produtoList.add(0, ds.getValue(Produto.class));
                     }
                     binding.txtInfo.setText("");
                 } else {
@@ -118,8 +118,6 @@ public class ProdutosLojaFragment extends Fragment implements AdapterProduto.onC
         dialogBinding.txtNomeProduto.setText(produto.getTitulo());
         dialogBinding.cbRascunho.setChecked(produto.isRascunho());
 
-        dialogBinding.progressBar.setVisibility(View.GONE);
-
         dialogBinding.imbFechar.setOnClickListener(v -> {
             dialog.dismiss();
         });
@@ -140,16 +138,22 @@ public class ProdutosLojaFragment extends Fragment implements AdapterProduto.onC
         });
 
         dialogBinding.cvRemover.setOnClickListener(v -> {
-            dialogBinding.progressBar.setVisibility(View.VISIBLE);
+            dialog.dismiss();
+
+            binding.progressBar.setVisibility(View.VISIBLE);
+            binding.txtInfo.setText("Deletando produto...");
             deletarFotosProduto(produto, () -> {
                 produto.deletar();
                 produtoList.remove(produto);
                 if(produtoList.isEmpty()){
                     binding.txtInfo.setText("Nenhum produto cadastrado.");
+                } else {
+                    binding.txtInfo.setText("");
                 }
+                binding.progressBar.setVisibility(View.GONE);
+
 
                 adapterProduto.notifyDataSetChanged();
-                dialog.dismiss();
             });
 
         });
