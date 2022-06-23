@@ -23,9 +23,11 @@
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_config.xml" value="0.3175" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_delete.xml" value="0.251" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_drag.xml" value="0.251" />
+        <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_editar.xml" value="0.251" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_email_off.xml" value="0.3175" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_email_on.xml" value="0.3175" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_favoritos_borda.xml" value="0.3175" />
+        <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_fechar.xml" value="0.251" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_galeria.xml" value="0.251" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_inico.xml" value="0.3175" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_launcher_background.xml" value="0.3175" />
@@ -54,6 +56,7 @@
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/dialog_categoria_form.xml" value="0.3087719298245614" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/dialog_delete.xml" value="0.33" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/dialog_form_produto_categoria.xml" value="0.2" />
+        <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/dialog_loja_produto.xml" value="0.33" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/fragment_carrinho_usuario.xml" value="0.3087719298245614" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/fragment_categorias_loja.xml" value="0.18" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/fragment_config_loja.xml" value="0.3087719298245614" />

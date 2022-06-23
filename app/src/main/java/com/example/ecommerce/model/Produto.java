@@ -21,6 +21,7 @@ public class Produto implements Serializable {
     private double valorAntigo;
     private double valorAtual;
     private List<String> idCategorias;
+    private boolean rascunho = false;
 
     public Produto() {
         DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference();
@@ -28,7 +29,7 @@ public class Produto implements Serializable {
     }
 
 
-    public void salvar() {
+    public void salvar(boolean novoProduto) {
         DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference()
                 .child("produtos")
                 .child(this.getId());
@@ -43,6 +44,13 @@ public class Produto implements Serializable {
                 .child(String.valueOf(imagemUpload.getIndex()));
         produtoRef.child("index").setValue(imagemUpload.getIndex());
         produtoRef.child("caminhoImagem").setValue(imagemUpload.getCaminhoImagem());
+    }
+
+    public void deletar(){
+        DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference()
+                .child("produtos")
+                .child(this.getId());
+        produtoRef.removeValue();
     }
 
 
@@ -110,5 +118,13 @@ public class Produto implements Serializable {
 
     public void setIdCategorias(List<String> idCategorias) {
         this.idCategorias = idCategorias;
+    }
+
+    public boolean isRascunho() {
+        return rascunho;
+    }
+
+    public void setRascunho(boolean rascunho) {
+        this.rascunho = rascunho;
     }
 }

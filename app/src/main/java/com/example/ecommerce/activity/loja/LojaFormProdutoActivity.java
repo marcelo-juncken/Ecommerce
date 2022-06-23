@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -81,13 +80,14 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     private DialogFormProdutoCategoriaBinding bindingDialogCategoria;
 
     private AdapterCategoriaDialog adapterCategoriaDialog;
-    private List<Categoria> categoriaList = new ArrayList<>();
+    private final List<Categoria> categoriaList = new ArrayList<>();
     private List<String> categoriasSelecionadasList = new ArrayList<>();
     private List<String> idsCategoriasSelecionadasList = new ArrayList<>();
     private List<String> categoriasSelecionadasTempList = new ArrayList<>();
     private List<String> idsCategoriasSelecionadasTempList = new ArrayList<>();
 
 
+    private boolean novoProduto = true;
     private AlertDialog dialog;
 
     @Override
@@ -103,8 +103,10 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             binding.include.txtTitulo.setText("Editar produto");
+            novoProduto = false;
             String produtoId = (String) bundle.getSerializable("produtoSelecionado");
             recuperaProduto(produtoId);
+
         } else {
             binding.include.txtTitulo.setText("Novo produto");
             binding.progressBar.setVisibility(View.GONE);
@@ -351,7 +353,7 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         double valorAtual = (double) binding.edtValorAtual.getRawValue() / 100;
 
         if (!titulo.isEmpty()) {
-            if (!idsCategoriasSelecionadasList.isEmpty()) {
+            if (!categoriasSelecionadasList.isEmpty()) {
                 binding.btnCategoria.setError(null);
                 if (!descricao.isEmpty()) {
                     if (valorAtual > 0) {
@@ -368,7 +370,7 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
                                 produto.setValorAtual(valorAtual);
                                 produto.setValorAntigo(valorAntigo);
                                 produto.setIdCategorias(idsCategoriasSelecionadasList);
-                                produto.salvar();
+                                produto.salvar(novoProduto);
 
                                 deletarImagens(this::salvarFotos);
                             }
@@ -408,18 +410,18 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
                         .child(imagemDeleteList.get(i).getIndex() + ".jpeg");
                 int finalI = i;
                 storageReference.delete().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference()
-                                .child("produtos")
-                                .child(produto.getId())
-                                .child("imagemUploadMap")
-                                .child(String.valueOf(imagemDeleteList.get(finalI).getIndex()));
-                        produtoRef.removeValue();
 
+                    DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference()
+                            .child("produtos")
+                            .child(produto.getId())
+                            .child("imagemUploadMap")
+                            .child(String.valueOf(imagemDeleteList.get(finalI).getIndex()));
+                    produtoRef.removeValue().addOnCompleteListener(task1 -> {
                         if (finalI + 1 == imagemDeleteList.size()) {
                             myCallback.onCallback();
                         }
-                    }
+                    });
+
                 });
 
             }

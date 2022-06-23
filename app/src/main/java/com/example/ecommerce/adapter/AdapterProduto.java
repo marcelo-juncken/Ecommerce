@@ -52,9 +52,14 @@ public class AdapterProduto extends RecyclerView.Adapter<AdapterProduto.MyViewHo
 
         if (produto.getValorAntigo() > 0) {
 
-            int valor = (int) (Math.ceil((1 - (produto.getValorAtual() / produto.getValorAntigo())) * 100));
-            holder.txtDescontoProduto.setText(String.format("%s%% OFF", valor));
-            holder.txtDescontoProduto.setPaintFlags(holder.txtDescontoProduto.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            int desconto = (int) (100 * (1 - produto.getValorAtual() / produto.getValorAntigo()));
+
+            if (desconto >= 10) {
+                holder.txtDescontoProduto.setText(String.format("%s%% OFF", desconto));
+                holder.txtDescontoProduto.setPaintFlags(holder.txtDescontoProduto.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            } else {
+                holder.txtDescontoProduto.setText("");
+            }
         }
 
         holder.txtValorAtual.setText(context.getString(R.string.valor_produto, GetMask.getValor(produto.getValorAtual())));

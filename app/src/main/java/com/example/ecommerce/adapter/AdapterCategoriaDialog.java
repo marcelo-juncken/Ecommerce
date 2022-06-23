@@ -39,11 +39,8 @@ public class AdapterCategoriaDialog extends RecyclerView.Adapter<AdapterCategori
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Categoria categoria = categoriaList.get(position);
 
-        if (idsCategoriasSelecionadas.contains(categoria.getId())){
-            holder.cbCategoria.setChecked(true);
-        } else {
-            holder.cbCategoria.setChecked(false);
-        }
+        holder.cbCategoria.setChecked(idsCategoriasSelecionadas.contains(categoria.getId()));
+
 
         holder.txtCategoria.setText(categoria.getNome());
         Picasso.get().load(categoria.getUrlImagem()).into(holder.imgCategoria);
