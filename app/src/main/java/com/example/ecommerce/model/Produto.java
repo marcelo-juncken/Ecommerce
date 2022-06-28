@@ -20,14 +20,13 @@ public class Produto implements Serializable {
     private String descricao;
     private double valorAntigo;
     private double valorAtual;
-    private List<String> idCategorias;
+    private Map<String, Boolean> idCategorias;
     private boolean rascunho = false;
 
     public Produto() {
         DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference();
         this.setId(produtoRef.push().getKey());
     }
-
 
     public void salvar(boolean novoProduto) {
         DatabaseReference produtoRef = FirebaseHelper.getDatabaseReference()
@@ -112,11 +111,11 @@ public class Produto implements Serializable {
         this.valorAtual = valorAtual;
     }
 
-    public List<String> getIdCategorias() {
+    public Map<String, Boolean> getIdCategorias() {
         return idCategorias;
     }
 
-    public void setIdCategorias(List<String> idCategorias) {
+    public void setIdCategorias(Map<String, Boolean> idCategorias) {
         this.idCategorias = idCategorias;
     }
 

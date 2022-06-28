@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.ecommerce"
-        minSdk 23
+        minSdk 24
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -60,4 +60,13 @@ dependencies {
 
     // https://github.com/BlacKCaT27/CurrencyEditText
     implementation 'com.github.BlacKCaT27:CurrencyEditText:2.0.2'
+
+    // https://github.com/santalu/maskara
+    implementation 'com.github.santalu:maskara:1.0.0'
+
+    // https://github.com/jd-alexander/LikeButton
+    implementation 'com.github.jd-alexander:LikeButton:0.2.3'
+
+    // https://github.com/smarteist/Android-Image-Slider
+    implementation 'com.github.smarteist:autoimageslider:1.4.0'
 }

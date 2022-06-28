@@ -1,12 +1,5 @@
 package com.example.ecommerce.adapter;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.ImageDecoder;
-import android.net.Uri;
-import android.os.Build;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,16 +13,12 @@ import com.example.ecommerce.R;
 import com.example.ecommerce.model.ImagemUpload;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class AdapterProdutoFotos extends RecyclerView.Adapter<AdapterProdutoFotos.MyViewHolder> {
 
     private final OnClickListener onClickListener;
-    private List<ImagemUpload> imagemUploadList;
+    private final List<ImagemUpload> imagemUploadList;
 
     public AdapterProdutoFotos(OnClickListener onClickListener, List<ImagemUpload> imagemUploadList) {
         this.onClickListener = onClickListener;

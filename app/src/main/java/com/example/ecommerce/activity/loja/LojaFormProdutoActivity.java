@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -27,7 +26,6 @@ import com.example.ecommerce.adapter.AdapterCategoriaDialog;
 import com.example.ecommerce.adapter.AdapterProdutoFotos;
 import com.example.ecommerce.databinding.ActivityLojaFormProdutoBinding;
 import com.example.ecommerce.databinding.BottomSheetDialogBinding;
-
 import com.example.ecommerce.databinding.DialogFormProdutoCategoriaBinding;
 import com.example.ecommerce.helper.FirebaseHelper;
 import com.example.ecommerce.helper.GetMask;
@@ -48,7 +46,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -80,11 +77,18 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     private DialogFormProdutoCategoriaBinding bindingDialogCategoria;
 
     private AdapterCategoriaDialog adapterCategoriaDialog;
+
     private final List<Categoria> categoriaList = new ArrayList<>();
-    private List<String> categoriasSelecionadasList = new ArrayList<>();
-    private List<String> idsCategoriasSelecionadasList = new ArrayList<>();
-    private List<String> categoriasSelecionadasTempList = new ArrayList<>();
-    private List<String> idsCategoriasSelecionadasTempList = new ArrayList<>();
+
+    private List<Categoria> categoriasSelecionadasList = new ArrayList<>();
+    private List<Categoria> categoriasSelecionadasTempList = new ArrayList<>();
+
+    private List<String> nomesCategoriasSelecionadasList = new ArrayList<>();
+    private List<String> nomesCategoriasSelecionadasTempList = new ArrayList<>();
+
+
+    private Map<String, Boolean> idsCategoriasSelecionadasMap = new HashMap<>();
+    private Map<String, Boolean> idsCategoriasSelecionadasTempMap = new HashMap<>();
 
 
     private boolean novoProduto = true;
@@ -163,21 +167,27 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
 
         imagemUploadMap.putAll(produto.getImagemUploadMap());
         imagemUploadList.addAll(produto.getImagemUploadMap().values());
-        Collections.sort(imagemUploadList, (o1, o2) -> Math.toIntExact(o1.getIndex() - o2.getIndex()));
+        imagemUploadList.sort((o1, o2) -> Math.toIntExact(o1.getIndex() - o2.getIndex()));
 
         binding.edtTitulo.setText(produto.getTitulo());
         binding.edtDescricao.setText(produto.getDescricao());
         binding.edtValorAntigo.setText(GetMask.getValor(produto.getValorAntigo()));
         binding.edtValorAtual.setText(GetMask.getValor(produto.getValorAtual()));
 
-        idsCategoriasSelecionadasList.addAll(produto.getIdCategorias());
-        for (Categoria categoria : categoriaList) {
-            if (produto.getIdCategorias().contains(categoria.getId())) {
-                categoriasSelecionadasList.add(categoria.getNome());
+        if (produto.getIdCategorias() != null) {
+            idsCategoriasSelecionadasMap.putAll(produto.getIdCategorias());
+            for (Categoria categoria : categoriaList) {
+                if (produto.getIdCategorias().containsKey(categoria.getId())) {
+                    categoriasSelecionadasList.add(categoria);
+                    nomesCategoriasSelecionadasList.add(categoria.getNome());
+                }
             }
+            categoriasSelecionadasTempList.addAll(categoriasSelecionadasList);
+            nomesCategoriasSelecionadasTempList.addAll(nomesCategoriasSelecionadasList);
         }
 
-        binding.btnCategoria.setText(TextUtils.join(", ", categoriasSelecionadasList));
+        binding.btnCategoria.setText(TextUtils.join(", ", nomesCategoriasSelecionadasList));
+
         adapterProdutoFotos.notifyDataSetChanged();
 
         binding.progressBar.setVisibility(View.GONE);
@@ -245,16 +255,20 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         configRVCategorias();
         bindingDialogCategoria.btnFechar.setOnClickListener(v -> {
 
+            nomesCategoriasSelecionadasTempList = new ArrayList<>(nomesCategoriasSelecionadasList);
+            idsCategoriasSelecionadasTempMap = new HashMap<>(idsCategoriasSelecionadasMap);
+            categoriasSelecionadasTempList = new ArrayList<>(categoriasSelecionadasList);
             adapterCategoriaDialog.notifyDataSetChanged();
             dialog.dismiss();
         });
         bindingDialogCategoria.btnSalvar.setOnClickListener(v -> {
 
-            idsCategoriasSelecionadasList = new ArrayList<>(idsCategoriasSelecionadasTempList);
+            nomesCategoriasSelecionadasList = new ArrayList<>(nomesCategoriasSelecionadasTempList);
             categoriasSelecionadasList = new ArrayList<>(categoriasSelecionadasTempList);
-            binding.btnCategoria.setText(TextUtils.join(", ", categoriasSelecionadasList));
+            binding.btnCategoria.setText(TextUtils.join(", ", nomesCategoriasSelecionadasTempList));
+            idsCategoriasSelecionadasMap = new HashMap<>(idsCategoriasSelecionadasTempMap);
 
-            if (!idsCategoriasSelecionadasList.isEmpty()) {
+            if (!categoriasSelecionadasTempList.isEmpty()) {
                 binding.btnCategoria.setError(null);
             } else {
                 binding.btnCategoria.setError("");
@@ -339,7 +353,7 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
         binding.btnSalvar.setOnClickListener(v -> validaDados());
 
         binding.btnCategoria.setOnClickListener(v -> {
-            idsCategoriasSelecionadasTempList = new ArrayList<>(idsCategoriasSelecionadasList);
+            idsCategoriasSelecionadasTempMap = new HashMap<>(idsCategoriasSelecionadasMap);
             categoriasSelecionadasTempList = new ArrayList<>(categoriasSelecionadasList);
             showDialogCategorias();
         });
@@ -369,7 +383,7 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
                                 produto.setDescricao(descricao);
                                 produto.setValorAtual(valorAtual);
                                 produto.setValorAntigo(valorAntigo);
-                                produto.setIdCategorias(idsCategoriasSelecionadasList);
+                                produto.setIdCategorias(idsCategoriasSelecionadasMap);
                                 produto.salvar(novoProduto);
 
                                 deletarImagens(this::salvarFotos);
@@ -436,27 +450,27 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
             for (int i = 0; i < imagemAddList.size(); i++) {
                 ImagemUpload imagemUpload = imagemAddList.get(i);
 
-                    StorageReference storageReference = FirebaseHelper.getStorageReference()
-                            .child("imagens")
-                            .child("produtos")
-                            .child(produto.getId())
-                            .child(imagemAddList.get(i).getIndex() + ".jpeg");
+                StorageReference storageReference = FirebaseHelper.getStorageReference()
+                        .child("imagens")
+                        .child("produtos")
+                        .child(produto.getId())
+                        .child(imagemAddList.get(i).getIndex() + ".jpeg");
 
-                    UploadTask uploadTask = storageReference.putFile(Uri.parse(imagemUpload.getCaminhoImagem()));
-                    int finalI = i;
-                    uploadTask.addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
+                UploadTask uploadTask = storageReference.putFile(Uri.parse(imagemUpload.getCaminhoImagem()));
+                int finalI = i;
+                uploadTask.addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
 
-                            imagemUpload.setCaminhoImagem(task.getResult().toString());
-                            imagemUploadMap.put(String.valueOf(imagemUpload.getIndex()), imagemUpload);
+                        imagemUpload.setCaminhoImagem(task.getResult().toString());
+                        imagemUploadMap.put(String.valueOf(imagemUpload.getIndex()), imagemUpload);
 
-                            produto.salvarImagem(imagemUpload);
+                        produto.salvarImagem(imagemUpload);
 
-                            if (finalI + 1 == imagemAddList.size()) {
-                                finish();
-                            }
+                        if (finalI + 1 == imagemAddList.size()) {
+                            finish();
                         }
-                    })).addOnFailureListener(e -> Toast.makeText(this, "Falha no upload, tente mais tarde", Toast.LENGTH_SHORT).show());
+                    }
+                })).addOnFailureListener(e -> Toast.makeText(this, "Falha no upload, tente mais tarde", Toast.LENGTH_SHORT).show());
             }
         } else {
             finish();
@@ -536,7 +550,7 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
     private void configRVCategorias() {
         bindingDialogCategoria.rvCategorias.setLayoutManager(new LinearLayoutManager(this));
         bindingDialogCategoria.rvCategorias.setHasFixedSize(true);
-        adapterCategoriaDialog = new AdapterCategoriaDialog(categoriaList, this, idsCategoriasSelecionadasList);
+        adapterCategoriaDialog = new AdapterCategoriaDialog(categoriaList, this, categoriasSelecionadasTempList);
         bindingDialogCategoria.rvCategorias.setAdapter(adapterCategoriaDialog);
     }
 
@@ -549,7 +563,7 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
                 bottomSheetDialog();
             } else {
                 ImagemUpload imagemUpload = imagemUploadList.get(position);
-                if(!imagemAddList.contains(imagemUpload)){
+                if (!imagemAddList.contains(imagemUpload)) {
                     imagemDeleteList.add(imagemUpload);
                 } else {
                     imagemAddList.remove(imagemUpload);
@@ -565,13 +579,16 @@ public class LojaFormProdutoActivity extends AppCompatActivity implements Adapte
 
     @Override
     public void onClick(Categoria categoria) {
-        if (idsCategoriasSelecionadasTempList.contains(categoria.getId())) {
+        if (idsCategoriasSelecionadasTempMap.containsKey(categoria.getId())) {
 
-            idsCategoriasSelecionadasTempList.remove(categoria.getId());
-            categoriasSelecionadasTempList.remove(categoria.getNome());
+            nomesCategoriasSelecionadasTempList.remove(categoria.getNome());
+            idsCategoriasSelecionadasTempMap.remove(categoria.getId());
+            categoriasSelecionadasTempList.remove(categoria);
         } else {
-            idsCategoriasSelecionadasTempList.add(categoria.getId());
-            categoriasSelecionadasTempList.add(categoria.getNome());
+
+            nomesCategoriasSelecionadasTempList.add(categoria.getNome());
+            idsCategoriasSelecionadasTempMap.put(categoria.getId(), true);
+            categoriasSelecionadasTempList.add(categoria);
         }
     }
 

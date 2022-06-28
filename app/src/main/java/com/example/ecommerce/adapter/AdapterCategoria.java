@@ -1,6 +1,7 @@
 package com.example.ecommerce.adapter;
 
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +21,15 @@ import java.util.List;
 
 public class AdapterCategoria extends RecyclerView.Adapter<AdapterCategoria.MyViewHolder> implements RecyclerRowMoveCallback.RecyclerViewRowTouchHelperContract {
 
+    private static int layout;
+    private final boolean background;
+    private int row_index = 0;
     private final List<Categoria> categoriaList;
     private final onClickListener onClickListener;
 
-    public AdapterCategoria(List<Categoria> categoriaList, AdapterCategoria.onClickListener onClickListener) {
+    public AdapterCategoria(int layout, boolean background, List<Categoria> categoriaList, AdapterCategoria.onClickListener onClickListener) {
+        AdapterCategoria.layout = layout;
+        this.background = background;
         this.categoriaList = categoriaList;
         this.onClickListener = onClickListener;
     }
@@ -31,7 +37,7 @@ public class AdapterCategoria extends RecyclerView.Adapter<AdapterCategoria.MyVi
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_categoria_horizontal, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
         return new MyViewHolder(itemView);
     }
 
@@ -42,8 +48,24 @@ public class AdapterCategoria extends RecyclerView.Adapter<AdapterCategoria.MyVi
         holder.txtCategoria.setText(categoria.getNome());
         Picasso.get().load(categoria.getUrlImagem()).into(holder.imgCategoria);
 
-        holder.itemView.setOnClickListener(v -> onClickListener.onClick(categoria));
-
+        if(background){
+            holder.itemView.setOnClickListener(v -> {
+                onClickListener.onClick(categoria);
+                row_index = holder.getAdapterPosition();
+                notifyDataSetChanged();
+            });
+            if(row_index == position){
+                holder.itemView.setBackgroundResource(R.drawable.bg_categoria_home);
+                holder.txtCategoria.setTextColor(Color.parseColor("#FFFFFF"));
+                holder.imgCategoria.setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_IN);
+            }else{
+                holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                holder.txtCategoria.setTextColor(Color.parseColor("#808080"));
+                holder.imgCategoria.setColorFilter(Color.parseColor("#000000"), PorterDuff.Mode.SRC_IN);
+            }
+        }else{
+            holder.itemView.setOnClickListener(v -> onClickListener.onClick(categoria));
+        }
     }
 
     @Override
@@ -54,40 +76,50 @@ public class AdapterCategoria extends RecyclerView.Adapter<AdapterCategoria.MyVi
     @Override
     public void onRowMoved(int from, int to) {
 
-        if (from < to) {
-            for (int i = from; i < to; i++) {
-                trocaPosicoes(i, i + 1);
-                Collections.swap(categoriaList, i, i + 1);
+        if (layout == R.layout.item_categoria_vertical) {
+            if (from < to) {
+                for (int i = from; i < to; i++) {
+                    trocaPosicoes(i, i + 1);
+                    Collections.swap(categoriaList, i, i + 1);
+                }
+            } else {
+                for (int i = from; i > to; i--) {
+                    trocaPosicoes(i, i - 1);
+                    Collections.swap(categoriaList, i, i - 1);
+                }
             }
-        } else {
-            for (int i = from; i > to; i--) {
-                trocaPosicoes(i, i - 1);
-                Collections.swap(categoriaList, i, i - 1);
-            }
+            notifyItemMoved(from, to);
         }
-        notifyItemMoved(from, to);
-
     }
 
     private void trocaPosicoes(int from, int to) {
-        long positionTemp;
-        positionTemp = categoriaList.get(from).getPosicao(); // pega a posicao do 0 e guarda na positionTemp
-        categoriaList.get(from).setPosicao(categoriaList.get(to).getPosicao()); // seta a posicao do 0 igual a do 1
-        categoriaList.get(to).setPosicao(positionTemp); // seta a posicao do 1 igual a positionTemp
-        categoriaList.get(from).salvar();
-        categoriaList.get(to).salvar();
+        if (layout == R.layout.item_categoria_vertical) {
+            long positionTemp;
+            positionTemp = categoriaList.get(from).getPosicao(); // pega a posicao do 0 e guarda na positionTemp
+            categoriaList.get(from).setPosicao(categoriaList.get(to).getPosicao()); // seta a posicao do 0 igual a do 1
+            categoriaList.get(to).setPosicao(positionTemp); // seta a posicao do 1 igual a positionTemp
+            categoriaList.get(from).salvar();
+            categoriaList.get(to).salvar();
+        }
+
     }
 
     @Override
     public void onRowSelected(RecyclerView.ViewHolder viewHolder) {
-        viewHolder.itemView.setBackgroundResource(R.color.colorIconeOnBnv);
-        viewHolder.itemView.setAlpha(0.8F);
+        if (layout == R.layout.item_categoria_vertical) {
+            viewHolder.itemView.setBackgroundResource(R.color.colorIconeOnBnv);
+            viewHolder.itemView.setAlpha(0.8F);
+        }
+
     }
 
     @Override
     public void onRowClear(RecyclerView.ViewHolder viewHolder) {
-        viewHolder.itemView.setBackgroundColor(Color.WHITE);
-        viewHolder.itemView.setAlpha(1F);
+        if (layout == R.layout.item_categoria_vertical) {
+            viewHolder.itemView.setBackgroundColor(Color.WHITE);
+            viewHolder.itemView.setAlpha(1F);
+        }
+
     }
 
 
@@ -104,8 +136,11 @@ public class AdapterCategoria extends RecyclerView.Adapter<AdapterCategoria.MyVi
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             imgCategoria = itemView.findViewById(R.id.imgCategoria);
-            imgDrag = itemView.findViewById(R.id.imgDrag);
             txtCategoria = itemView.findViewById(R.id.txtCategoria);
+
+            if (layout == R.layout.item_categoria_vertical) {
+                imgDrag = itemView.findViewById(R.id.imgDrag);
+            }
         }
     }
 

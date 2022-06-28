@@ -97,7 +97,7 @@ public class ProdutosLojaFragment extends Fragment implements AdapterProduto.onC
     private void configRV() {
         binding.rvProdutos.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         binding.rvProdutos.setHasFixedSize(true);
-        adapterProduto = new AdapterProduto(produtoList, getContext(), this);
+        adapterProduto = new AdapterProduto(R.layout.item_produto_list, produtoList, getContext(), this, false, null, null);
         binding.rvProdutos.setAdapter(adapterProduto);
     }
 

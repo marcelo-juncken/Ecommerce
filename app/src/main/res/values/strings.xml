@@ -12,5 +12,6 @@
     <string name="menu_config">Config</string>
 
     <string name="valor_produto"> R$ %1$s</string>
+    <string name="total_produto">TOTAL: R$ %1$s</string>
     <string name="valor_striked"> <strike> R$ %1$s </strike> </string>
 </resources>

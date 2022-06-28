@@ -30,7 +30,6 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         hideSystemBars();
 
-        //FirebaseHelper.getAuth().signOut();
         new Handler(getMainLooper()).postDelayed(this::verificaAcesso, 3000);
     }
 
@@ -39,9 +38,8 @@ public class SplashActivity extends AppCompatActivity {
             recuperaAcesso();
         } else {
             finish();
-            startActivity(new Intent(this, LoginActivity.class));
+            startActivity(new Intent(this, MainActivityUsuario.class));
         }
-
     }
 
     private void recuperaAcesso(){

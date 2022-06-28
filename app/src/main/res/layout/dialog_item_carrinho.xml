@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:paddingBottom="16dp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView3"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="32dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imgProduto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/txtNomeProduto"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/cvRemover"
+        app:layout_constraintStart_toStartOf="@+id/cvCancelar"
+        app:layout_constraintTop_toBottomOf="@+id/cardView3"
+        tools:text="Óculos Oakley Sutro Prizm" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvCancelar"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="5dp"
+        app:layout_constraintEnd_toStartOf="@+id/cvFavorito"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/cvFavorito">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:tint="@color/cor_laranja"
+            android:src="@drawable/ic_cancel" />
+
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Cancelar"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/cvCancelar"
+        app:layout_constraintStart_toStartOf="@+id/cvCancelar"
+        app:layout_constraintTop_toBottomOf="@+id/cvCancelar" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvFavorito"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="5dp"
+        app:layout_constraintEnd_toStartOf="@+id/cvRemover"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/cvCancelar"
+        app:layout_constraintTop_toBottomOf="@+id/txtNomeProduto">
+
+        <com.like.LikeButton
+            android:id="@+id/btnLike"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:anim_scale_factor="2"
+            app:icon_size="25dp"
+            app:icon_type="Heart"
+            app:is_enabled="true"
+            android:layout_gravity="center"
+            android:elevation="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:like_drawable="@drawable/ic_favorite"
+            app:liked="false"
+            app:unlike_drawable="@drawable/ic_favorite_off"
+            />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Favoritar"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/cvFavorito"
+        app:layout_constraintStart_toStartOf="@+id/cvFavorito"
+        app:layout_constraintTop_toBottomOf="@+id/cvFavorito" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvRemover"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/cvFavorito"
+        app:layout_constraintTop_toTopOf="@+id/cvFavorito">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/cor_delete" />
+
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Remover"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/cvRemover"
+        app:layout_constraintStart_toStartOf="@+id/cvRemover"
+        app:layout_constraintTop_toBottomOf="@+id/cvRemover" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="170dp"
+    android:layout_marginHorizontal="8dp"
+    android:orientation="vertical">
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="3dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView5"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/imgProduto"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="8dp"
+                    tools:src="@drawable/placeholder_form_categorias" />
+
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/txtProduto"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
+                android:ellipsize="end"
+                android:maxLines="3"
+                app:layout_constraintEnd_toStartOf="@+id/imgDelete"
+                app:layout_constraintStart_toEndOf="@+id/cardView5"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Tênis Adidas Run Falcon Feminino - Marinho" />
+
+            <ImageView
+                android:id="@+id/imgDelete"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_delete_borda_cinza"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <ImageButton
+                android:id="@+id/imbRem"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginVertical="8dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_borda_cinza"
+                android:padding="8dp"
+                android:src="@drawable/ic_menos"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/cardView5" />
+
+            <TextView
+                android:id="@+id/txtQtd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginVertical="8dp"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxWidth="60dp"
+                android:maxLines="1"
+                android:text="1"
+                android:textColor="@color/cor_laranja"
+                app:layout_constraintBottom_toBottomOf="@+id/imbRem"
+                app:layout_constraintStart_toEndOf="@+id/imbRem"
+                app:layout_constraintTop_toTopOf="@+id/imbRem" />
+
+            <ImageButton
+                android:id="@+id/imbAdd"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_borda_cinza"
+                android:src="@drawable/ic_add_cinza"
+                app:layout_constraintBottom_toBottomOf="@+id/imbRem"
+                app:layout_constraintStart_toEndOf="@+id/txtQtd"
+                app:layout_constraintTop_toTopOf="@+id/imbRem" />
+
+            <TextView
+                android:id="@+id/txtValor"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:ellipsize="end"
+                android:maxWidth="100dp"
+                android:maxLines="1"
+                android:textAlignment="textEnd"
+                android:textColor="@color/cor_laranja"
+                app:layout_constraintBottom_toBottomOf="@+id/imbAdd"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/imbAdd"
+                tools:text="R$ 199,99" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

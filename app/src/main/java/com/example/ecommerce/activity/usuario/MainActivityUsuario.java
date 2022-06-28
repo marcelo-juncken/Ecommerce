@@ -25,9 +25,17 @@ public class MainActivityUsuario extends AppCompatActivity {
 
         NavHostFragment navHostFragment =
                 (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        NavController navController = navHostFragment.getNavController();
+        NavController navController = null;
+        if (navHostFragment != null) {
+            navController = navHostFragment.getNavController();
+        }
 
         NavigationUI.setupWithNavController(binding.bottomNavigationView, navController);
+
+        int id = getIntent().getIntExtra("id", 0);
+        if (id==2){
+            binding.bottomNavigationView.setSelectedItemId(R.id.menu_carrinho);
+        }
 
     }
 

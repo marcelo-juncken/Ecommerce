@@ -20,12 +20,12 @@ public class AdapterCategoriaDialog extends RecyclerView.Adapter<AdapterCategori
 
     private final List<Categoria> categoriaList;
     private final onClickListener onClickListener;
-    private final List<String> idsCategoriasSelecionadas;
+    private final List<Categoria> categoriasSelecionadas;
 
-    public AdapterCategoriaDialog(List<Categoria> categoriaList, AdapterCategoriaDialog.onClickListener onClickListener, List<String> idsCategoriasSelecionadas) {
+    public AdapterCategoriaDialog(List<Categoria> categoriaList, AdapterCategoriaDialog.onClickListener onClickListener, List<Categoria> categoriasSelecionadas) {
         this.categoriaList = categoriaList;
         this.onClickListener = onClickListener;
-        this.idsCategoriasSelecionadas = idsCategoriasSelecionadas;
+        this.categoriasSelecionadas = categoriasSelecionadas;
     }
 
     @NonNull
@@ -39,7 +39,7 @@ public class AdapterCategoriaDialog extends RecyclerView.Adapter<AdapterCategori
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Categoria categoria = categoriaList.get(position);
 
-        holder.cbCategoria.setChecked(idsCategoriasSelecionadas.contains(categoria.getId()));
+        holder.cbCategoria.setChecked(categoriasSelecionadas.contains(categoria));
 
 
         holder.txtCategoria.setText(categoria.getNome());

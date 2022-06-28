@@ -122,7 +122,7 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
     private void configRV() {
         binding.rvCategorias.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvCategorias.setHasFixedSize(true);
-        adapterCategoria = new AdapterCategoria(categoriaList, this);
+        adapterCategoria = new AdapterCategoria(R.layout.item_categoria_vertical, false,categoriaList, this);
 
 
         ItemTouchHelper.Callback callback = new RecyclerRowMoveCallback(adapterCategoria);
