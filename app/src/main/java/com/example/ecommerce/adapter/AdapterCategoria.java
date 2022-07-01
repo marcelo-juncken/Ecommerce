@@ -27,7 +27,7 @@ public class AdapterCategoria extends RecyclerView.Adapter<AdapterCategoria.MyVi
     private final List<Categoria> categoriaList;
     private final onClickListener onClickListener;
 
-    public AdapterCategoria(int layout, boolean background, List<Categoria> categoriaList, AdapterCategoria.onClickListener onClickListener) {
+    public AdapterCategoria(int layout, boolean background, List<Categoria> categoriaList, onClickListener onClickListener) {
         AdapterCategoria.layout = layout;
         this.background = background;
         this.categoriaList = categoriaList;

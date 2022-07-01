@@ -3,20 +3,48 @@ package com.example.ecommerce.model;
 import com.example.ecommerce.helper.FirebaseHelper;
 import com.google.firebase.database.DatabaseReference;
 
-public class Endereco {
+import java.io.Serializable;
+
+public class Endereco implements Serializable {
 
     private String id;
-    private  String nomeEndereco;
+    private String nomeEndereco;
     private String cep;
     private String logradouro;
     private String numero;
     private String bairro;
     private String localidade;
+    private long posicao;
     private String uf;
 
     public Endereco() {
-        DatabaseReference enderecoRef= FirebaseHelper.getDatabaseReference();
+        DatabaseReference enderecoRef = FirebaseHelper.getDatabaseReference();
         this.setId(enderecoRef.push().getKey());
+        this.setPosicao(System.currentTimeMillis());
+    }
+
+    public void salvar(){
+        DatabaseReference enderecoRef = FirebaseHelper.getDatabaseReference()
+                .child("enderecos")
+                .child(FirebaseHelper.getIdFirebase())
+                .child(this.id);
+        enderecoRef.setValue(this);
+    }
+
+    public void deletar(){
+        DatabaseReference enderecoRef = FirebaseHelper.getDatabaseReference()
+                .child("enderecos")
+                .child(FirebaseHelper.getIdFirebase())
+                .child(this.id);
+        enderecoRef.removeValue();
+    }
+
+    public long getPosicao() {
+        return posicao;
+    }
+
+    public void setPosicao(long posicao) {
+        this.posicao = posicao;
     }
 
     public String getId() {

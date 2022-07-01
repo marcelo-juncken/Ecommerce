@@ -1,6 +1,7 @@
 package com.example.ecommerce.fragment.usuario;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,7 +17,9 @@ import android.widget.Toast;
 import com.example.ecommerce.DAO.ItemDAO;
 import com.example.ecommerce.DAO.ItemPedidoDAO;
 import com.example.ecommerce.R;
+import com.example.ecommerce.activity.usuario.UsuarioResumoPedidoActivity;
 import com.example.ecommerce.adapter.AdapterCarrinho;
+import com.example.ecommerce.autenticacao.LoginActivity;
 import com.example.ecommerce.databinding.DialogItemCarrinhoBinding;
 import com.example.ecommerce.databinding.FragmentCarrinhoUsuarioBinding;
 import com.example.ecommerce.helper.FirebaseHelper;
@@ -66,8 +69,19 @@ public class CarrinhoUsuarioFragment extends Fragment implements AdapterCarrinho
         itemPedidoDAO = new ItemPedidoDAO(requireContext());
         itemDAO = new ItemDAO(requireContext());
         itemPedidoList.addAll(itemPedidoDAO.getList());
+        configCliques();
         configRv();
         configTotalCarrinho();
+    }
+
+    private void configCliques() {
+        binding.btnContinuar.setOnClickListener(v -> {
+            if (FirebaseHelper.getAutenticado()){
+                startActivity(new Intent(getContext(), UsuarioResumoPedidoActivity.class));
+            }else{
+                startActivity(new Intent(getContext(), LoginActivity.class));
+            }
+        });
     }
 
 

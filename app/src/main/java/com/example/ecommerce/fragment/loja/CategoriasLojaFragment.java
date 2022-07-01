@@ -125,7 +125,7 @@ public class CategoriasLojaFragment extends Fragment implements AdapterCategoria
         adapterCategoria = new AdapterCategoria(R.layout.item_categoria_vertical, false,categoriaList, this);
 
 
-        ItemTouchHelper.Callback callback = new RecyclerRowMoveCallback(adapterCategoria);
+        ItemTouchHelper.Callback callback = new RecyclerRowMoveCallback(adapterCategoria, true);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(binding.rvCategorias);
 

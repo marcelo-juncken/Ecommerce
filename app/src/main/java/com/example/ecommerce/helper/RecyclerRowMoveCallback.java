@@ -13,15 +13,16 @@ import androidx.recyclerview.widget.RecyclerView;
 public class RecyclerRowMoveCallback extends ItemTouchHelper.Callback {
 
     private final RecyclerViewRowTouchHelperContract touchHelperContract;
+    private static boolean isDragable;
 
-
-    public RecyclerRowMoveCallback(RecyclerViewRowTouchHelperContract touchHelperContract) {
+    public RecyclerRowMoveCallback(RecyclerViewRowTouchHelperContract touchHelperContract, boolean isDragable) {
         this.touchHelperContract = touchHelperContract;
+        RecyclerRowMoveCallback.isDragable = isDragable;
     }
 
     @Override
     public boolean isLongPressDragEnabled() {
-        return true;
+        return isDragable;
     }
 
     @Override
@@ -69,5 +70,10 @@ public class RecyclerRowMoveCallback extends ItemTouchHelper.Callback {
 
         void onRowClear(RecyclerView.ViewHolder viewHolder);
 
+        default boolean isDragable(){
+          return isDragable;
+        };
+
     }
+
 }

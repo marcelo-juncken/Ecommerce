@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.example.ecommerce.R;
 import com.example.ecommerce.activity.loja.LojaConfigActivity;
+import com.example.ecommerce.activity.loja.LojaPagamentosActivity;
 import com.example.ecommerce.activity.loja.LojaRecebimentosActivity;
 import com.example.ecommerce.activity.usuario.MainActivityUsuario;
 import com.example.ecommerce.databinding.FragmentConfigLojaBinding;
@@ -37,7 +38,7 @@ public class ConfigLojaFragment extends Fragment {
 
     private void configCliques() {
         binding.lLConfig.setOnClickListener(v -> startActivity(new Intent(requireActivity(), LojaConfigActivity.class)));
-        binding.lLPagamentos.setOnClickListener(v -> startActivity(new Intent(requireActivity(), LojaRecebimentosActivity.class)));
+        binding.lLPagamentos.setOnClickListener(v -> startActivity(new Intent(requireActivity(), LojaPagamentosActivity.class)));
 
         binding.lLSair.setOnClickListener(v -> {
             FirebaseHelper.getAuth().signOut();
