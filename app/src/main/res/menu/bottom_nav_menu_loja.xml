@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_pedidos"
+        android:id="@+id/menu_pedidos_loja"
         android:icon="@drawable/ic_loja_pedidos"
         android:title="@string/menu_pedidos"/>
 

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.example.ecommerce.R;
 import com.example.ecommerce.activity.usuario.UsuarioEnderecoActivity;
+import com.example.ecommerce.activity.usuario.UsuarioPerfilActivity;
 import com.example.ecommerce.autenticacao.CadastroActivity;
 import com.example.ecommerce.autenticacao.LoginActivity;
 import com.example.ecommerce.databinding.FragmentPerfilUsuarioBinding;
@@ -36,8 +37,13 @@ public class PerfilUsuarioFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        configDados();
         configCliques();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        configDados();
     }
 
     private void configDados() {
@@ -56,7 +62,7 @@ public class PerfilUsuarioFragment extends Fragment {
         binding.btnCadastrar.setOnClickListener(v -> startActivity(new Intent(requireActivity(),CadastroActivity.class)));
 
         binding.lLEnderecos.setOnClickListener(v -> startActivity(UsuarioEnderecoActivity.class));
-        binding.lLPerfil.setOnClickListener(v -> startActivity(UsuarioEnderecoActivity.class));
+        binding.lLPerfil.setOnClickListener(v -> startActivity(UsuarioPerfilActivity.class));
 
         binding.lLSair.setOnClickListener(v -> {
             binding.llLogin.setVisibility(View.VISIBLE);

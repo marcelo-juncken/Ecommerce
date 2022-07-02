@@ -3,24 +3,61 @@ package com.example.ecommerce.model;
 import com.example.ecommerce.helper.FirebaseHelper;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ServerValue;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Pedido {
+public class Pedido implements Serializable {
 
     private String id;
-    private int status; // 1 - Pendente, 2 -> Aprovado, 3 -> Cancelado
+    private StatusPedido statusPedido = StatusPedido.PENDENTE;
     private String idCliente;
     private Endereco endereco;
     private List<ItemPedido> itemPedidoList = new ArrayList<>();
-    private long data;
+    private long dataPedido;
+    private long dataStatusPedido;
     private double total;
     private String pagamento;
+    private double desconto;
+    private double acrescimo;
 
     public Pedido() {
-        DatabaseReference pedidoRef= FirebaseHelper.getDatabaseReference();
+        DatabaseReference pedidoRef = FirebaseHelper.getDatabaseReference();
         this.setId(pedidoRef.push().getKey());
+    }
+
+    public void salvar(boolean novoPedido) {
+        DatabaseReference usuarioPedidoRef = FirebaseHelper.getDatabaseReference()
+                .child("usuarioPedidos")
+                .child(FirebaseHelper.getIdFirebase())
+                .child(this.getId());
+        usuarioPedidoRef.setValue(this);
+
+
+        DatabaseReference lojaPedidoRef = FirebaseHelper.getDatabaseReference()
+                .child("lojaPedidos")
+                .child(this.getId());
+        lojaPedidoRef.setValue(this);
+
+
+        if (novoPedido) {
+            DatabaseReference dataPedidoUsuarioRef = usuarioPedidoRef
+                    .child("dataPedido");
+            dataPedidoUsuarioRef.setValue(ServerValue.TIMESTAMP);
+
+            DatabaseReference dataPedidoLojaRef = lojaPedidoRef
+                    .child("dataPedido");
+            dataPedidoLojaRef.setValue(ServerValue.TIMESTAMP);
+        }
+        DatabaseReference dataStatusPedidoUsuarioRef = usuarioPedidoRef
+                .child("dataStatusPedido");
+        dataStatusPedidoUsuarioRef.setValue(ServerValue.TIMESTAMP);
+
+        DatabaseReference dataStatusPedidoLojaRef = lojaPedidoRef
+                .child("dataStatusPedido");
+        dataStatusPedidoLojaRef.setValue(ServerValue.TIMESTAMP);
     }
 
     @Exclude
@@ -32,12 +69,12 @@ public class Pedido {
         this.id = id;
     }
 
-    public int getStatus() {
-        return status;
+    public StatusPedido getStatusPedido() {
+        return statusPedido;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setStatusPedido(StatusPedido statusPedido) {
+        this.statusPedido = statusPedido;
     }
 
     public String getIdCliente() {
@@ -64,12 +101,20 @@ public class Pedido {
         this.itemPedidoList = itemPedidoList;
     }
 
-    public long getData() {
-        return data;
+    public long getDataPedido() {
+        return dataPedido;
     }
 
-    public void setData(long data) {
-        this.data = data;
+    public void setDataPedido(long dataPedido) {
+        this.dataPedido = dataPedido;
+    }
+
+    public long getDataStatusPedido() {
+        return dataStatusPedido;
+    }
+
+    public void setDataStatusPedido(long dataStatusPedido) {
+        this.dataStatusPedido = dataStatusPedido;
     }
 
     public double getTotal() {
@@ -87,4 +132,22 @@ public class Pedido {
     public void setPagamento(String pagamento) {
         this.pagamento = pagamento;
     }
+
+    public double getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(double desconto) {
+        this.desconto = desconto;
+    }
+
+    public double getAcrescimo() {
+        return acrescimo;
+    }
+
+    public void setAcrescimo(double acrescimo) {
+        this.acrescimo = acrescimo;
+    }
 }
+
+

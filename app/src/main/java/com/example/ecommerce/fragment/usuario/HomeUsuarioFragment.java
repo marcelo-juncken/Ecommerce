@@ -1,10 +1,12 @@
 package com.example.ecommerce.fragment.usuario;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -215,5 +217,11 @@ public class HomeUsuarioFragment extends Fragment implements AdapterCategoria.on
             idsFavoritosList.remove(produto.getId());
         }
         Favorito.salvar(idsFavoritosList);
+    }
+
+    private void ocultarTeclado() {
+        ((InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(
+                binding.searchView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS
+        );
     }
 }

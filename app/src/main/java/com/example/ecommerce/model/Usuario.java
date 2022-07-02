@@ -9,6 +9,7 @@ public class Usuario {
     private String nome;
     private String email;
     private String senha;
+    private String telefone;
 
     public Usuario() {
     }
@@ -53,5 +54,11 @@ public class Usuario {
         this.senha = senha;
     }
 
+    public String getTelefone() {
+        return telefone;
+    }
 
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
 }

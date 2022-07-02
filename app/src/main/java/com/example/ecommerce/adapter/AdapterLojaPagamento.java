@@ -2,10 +2,12 @@ package com.example.ecommerce.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,11 +23,14 @@ import java.util.List;
 
 public class AdapterLojaPagamento extends RecyclerView.Adapter<AdapterLojaPagamento.MyViewHolder> implements RecyclerRowMoveCallback.RecyclerViewRowTouchHelperContract {
 
+    private int row_index = -1;
+    private static int layout;
     private final List<FormaPagamento> formaPagamentoList;
     private final onClickListener onClickListener;
     private final Context context;
 
-    public AdapterLojaPagamento(List<FormaPagamento> formaPagamentoList, AdapterLojaPagamento.onClickListener onClickListener, Context context) {
+    public AdapterLojaPagamento(int layout, List<FormaPagamento> formaPagamentoList, AdapterLojaPagamento.onClickListener onClickListener, Context context) {
+        AdapterLojaPagamento.layout = layout;
         this.formaPagamentoList = formaPagamentoList;
         this.onClickListener = onClickListener;
         this.context = context;
@@ -34,7 +39,7 @@ public class AdapterLojaPagamento extends RecyclerView.Adapter<AdapterLojaPagame
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_forma_pagamento_adapter, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
         return new MyViewHolder(itemView);
     }
 
@@ -45,22 +50,37 @@ public class AdapterLojaPagamento extends RecyclerView.Adapter<AdapterLojaPagame
         holder.txtNome.setText(formaPagamento.getNome());
         holder.txtDescricao.setText(formaPagamento.getDescricao());
 
-        if (formaPagamento.isOpcao()) {
-            holder.txtValor.setText(context.getString(R.string.valor_produto, GetMask.getValor(formaPagamento.getValor())));
+        if (layout == R.layout.item_forma_pagamento_adapter) {
+            if (formaPagamento.isOpcao()) {
+                holder.txtValor.setText(context.getString(R.string.valor_produto, GetMask.getValor(formaPagamento.getValor())));
 
-            if (formaPagamento.getTipoValor().equals("DESC")) {
-                holder.txtTipoPagamento.setText("Desconto");
-            } else if (formaPagamento.getTipoValor().equals("ACRES")) {
-                holder.txtTipoPagamento.setText("Acréscimo");
+                if (formaPagamento.getTipoValor().equals("DESC")) {
+                    holder.txtTipoPagamento.setText("Desconto");
+                } else if (formaPagamento.getTipoValor().equals("ACRES")) {
+                    holder.txtTipoPagamento.setText("Acréscimo");
+                } else {
+                    holder.txtTipoPagamento.setText("");
+                }
             } else {
+                holder.txtValor.setText("");
                 holder.txtTipoPagamento.setText("");
             }
+
         } else {
-            holder.txtValor.setText("Nenhuma opção de desconto ou acréscimo selecionada");
-            holder.txtTipoPagamento.setText("");
+            if (row_index != position){
+                holder.rbOpcao.setChecked(false);
+            }
         }
 
-        holder.itemView.setOnClickListener(v -> onClickListener.onClick(formaPagamento));
+
+        holder.itemView.setOnClickListener(v -> {
+            if (layout == R.layout.item_pagamento_pedido_adapter) {
+                holder.rbOpcao.setChecked(true);
+                row_index = holder.getAdapterPosition();
+                notifyDataSetChanged();
+            }
+            onClickListener.onClick(formaPagamento);
+        });
 
     }
 
@@ -115,20 +135,21 @@ public class AdapterLojaPagamento extends RecyclerView.Adapter<AdapterLojaPagame
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView imgDrag;
         TextView txtNome, txtDescricao, txtValor, txtTipoPagamento;
+        RadioButton rbOpcao;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+
             txtNome = itemView.findViewById(R.id.txtNome);
             txtDescricao = itemView.findViewById(R.id.txtDescricao);
             txtValor = itemView.findViewById(R.id.txtValor);
             txtTipoPagamento = itemView.findViewById(R.id.txtTipoPagamento);
 
-            imgDrag = itemView.findViewById(R.id.imgDrag);
-
+            if (layout == R.layout.item_pagamento_pedido_adapter) {
+                rbOpcao = itemView.findViewById(R.id.rbOpcao);
+            }
         }
     }
-
 
 }

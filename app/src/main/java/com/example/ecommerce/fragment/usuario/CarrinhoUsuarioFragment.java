@@ -1,9 +1,12 @@
 package com.example.ecommerce.fragment.usuario;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -18,6 +21,7 @@ import com.example.ecommerce.DAO.ItemDAO;
 import com.example.ecommerce.DAO.ItemPedidoDAO;
 import com.example.ecommerce.R;
 import com.example.ecommerce.activity.usuario.UsuarioResumoPedidoActivity;
+import com.example.ecommerce.activity.usuario.UsuarioSelecionaPagamentoActivity;
 import com.example.ecommerce.adapter.AdapterCarrinho;
 import com.example.ecommerce.autenticacao.LoginActivity;
 import com.example.ecommerce.databinding.DialogItemCarrinhoBinding;
@@ -73,17 +77,6 @@ public class CarrinhoUsuarioFragment extends Fragment implements AdapterCarrinho
         configRv();
         configTotalCarrinho();
     }
-
-    private void configCliques() {
-        binding.btnContinuar.setOnClickListener(v -> {
-            if (FirebaseHelper.getAutenticado()){
-                startActivity(new Intent(getContext(), UsuarioResumoPedidoActivity.class));
-            }else{
-                startActivity(new Intent(getContext(), LoginActivity.class));
-            }
-        });
-    }
-
 
     private void recuperaFavoritos(Produto produto) {
         idsFavoritosList.clear();
@@ -217,4 +210,29 @@ public class CarrinhoUsuarioFragment extends Fragment implements AdapterCarrinho
         dialog.setCancelable(false);
 
     }
+
+    private void configCliques() {
+        binding.btnContinuar.setOnClickListener(v -> {
+            if (FirebaseHelper.getAutenticado()){
+                if(!itemPedidoList.isEmpty()){
+                    startActivity(new Intent(getContext(), UsuarioSelecionaPagamentoActivity.class));
+                } else {
+                    Toast.makeText(requireContext(), "Nenhum item no carrinho", Toast.LENGTH_SHORT).show();
+                }
+            }else{
+                resultLauncher.launch(new Intent(getContext(), LoginActivity.class));
+            }
+        });
+    }
+
+    private final ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                        startActivity(new Intent(getContext(), UsuarioSelecionaPagamentoActivity.class));
+                }
+            }
+    );
+
+
 }

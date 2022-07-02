@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.ecommerce.R;
 import com.example.ecommerce.adapter.AdapterLojaPagamento;
 import com.example.ecommerce.databinding.ActivityLojaPagamentosBinding;
 import com.example.ecommerce.databinding.SnackbarDeleteFormaPagamentoBinding;
@@ -58,9 +59,9 @@ public class LojaPagamentosActivity extends AppCompatActivity implements Adapter
     private void configRv() {
         binding.rvPagamentos.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         binding.rvPagamentos.setHasFixedSize(true);
-        adapterLojaPagamento = new AdapterLojaPagamento(formaPagamentoList,this,getBaseContext());
+        adapterLojaPagamento = new AdapterLojaPagamento(R.layout.item_forma_pagamento_adapter,formaPagamentoList,this,getBaseContext());
 
-        ItemTouchHelper.Callback callback = new RecyclerRowMoveCallback(adapterLojaPagamento, true);
+        ItemTouchHelper.Callback callback = new RecyclerRowMoveCallback(adapterLojaPagamento);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(binding.rvPagamentos);
 

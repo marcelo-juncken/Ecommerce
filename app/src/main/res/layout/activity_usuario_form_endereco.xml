@@ -58,22 +58,26 @@
                         android:layout_height="wrap_content"
                         android:text="CEP" />
 
-                    <EditText
+                    <com.santalu.maskara.widget.MaskEditText
+                        app:mask="_____-___"
+                        app:maskCharacter="_"
+                        app:maskStyle="completable"
                         android:id="@+id/editCEP"
                         android:layout_marginTop="8dp"
+                        android:hint="00000-000"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_edit_on"
-                        android:hint="00000-000"
                         android:inputType="number"
                         android:padding="16dp" />
+
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.1"
                     android:orientation="vertical">
 
                     <TextView
@@ -96,7 +100,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="1.2"
                     android:orientation="vertical">
 
                     <TextView
@@ -110,7 +114,7 @@
                         android:layout_marginTop="8dp"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_edit_on"
-                        android:hint="__"
+                        android:hint="ex: 601"
                         android:inputType="text"
                         android:padding="16dp" />
                 </LinearLayout>

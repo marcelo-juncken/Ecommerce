@@ -45,7 +45,7 @@ public class ItemPedidoDAO {
         return true;
     }
 
-    public boolean editarProduto(ItemPedido itemPedido) {
+    public void editarProduto(ItemPedido itemPedido) {
 
         ContentValues values = new ContentValues();
         values.put("quantidade", itemPedido.getQuantidade());
@@ -58,13 +58,11 @@ public class ItemPedidoDAO {
             Log.i("INFO_DB", "onCreate: Sucesso ao salvar a tabela.");
         } catch (Exception e) {
             Log.i("INFO_DB", "onCreate: Erro ao atualizar o itemPedido." + e.getMessage());
-            return false;
         }
 
-        return true;
     }
 
-    public boolean removerProduto(Produto produto) {
+    public void removerProduto(Produto produto) {
 
         String WHERE = " id=?";
         String[] args = {String.valueOf(produto.getIdLocal())};
@@ -74,10 +72,19 @@ public class ItemPedidoDAO {
             Log.i("INFO_DB", "onCreate: Sucesso ao deletar item.");
         } catch (Exception e) {
             Log.i("INFO_DB", "onCreate: Erro ao deletar o item." + e.getMessage());
-            return false;
         }
 
-        return true;
+    }
+
+    public void limparCarrinho() {
+        try {
+            write.delete(DBHelper.TABELA_ITEM_PEDIDO, null, null);
+            write.delete(DBHelper.TABELA_ITEM, null, null);
+            Log.i("INFO_DB", "onCreate: Sucesso ao limpar carrinho.");
+        } catch (Exception e) {
+            Log.i("INFO_DB", "onCreate: Erro ao limpar carrinho." + e.getMessage());
+        }
+
     }
 
     public Produto getProduto(int idProduto) {
@@ -130,6 +137,7 @@ public class ItemPedidoDAO {
             itemPedido.setId(id);
             itemPedido.setValor(valor);
             itemPedido.setQuantidade(quantidade);
+            itemPedido.setNomeProduto(getProduto(id).getTitulo());
 
             itemPedidoList.add(itemPedido);
 

@@ -17,7 +17,6 @@ import com.example.ecommerce.databinding.ActivityUsuarioEnderecoBinding;
 import com.example.ecommerce.databinding.SnackbarDeleteEnderecoBinding;
 import com.example.ecommerce.helper.FirebaseHelper;
 import com.example.ecommerce.helper.RecyclerRowMoveCallback;
-import com.example.ecommerce.model.Categoria;
 import com.example.ecommerce.model.Endereco;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -93,7 +92,7 @@ public class UsuarioEnderecoActivity extends AppCompatActivity implements Adapte
         binding.rvEnderecos.setHasFixedSize(true);
         adapterEndereco = new AdapterEndereco(enderecoList, this);
 
-        ItemTouchHelper.Callback callback = new RecyclerRowMoveCallback(adapterEndereco, true);
+        ItemTouchHelper.Callback callback = new RecyclerRowMoveCallback(adapterEndereco);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(binding.rvEnderecos);
 

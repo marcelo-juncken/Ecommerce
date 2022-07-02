@@ -19,6 +19,7 @@ import com.example.ecommerce.model.Usuario;
 public class CadastroActivity extends AppCompatActivity {
 
     private ActivityCadastroBinding binding;
+    private boolean fromLogin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +27,10 @@ public class CadastroActivity extends AppCompatActivity {
         binding = ActivityCadastroBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        Bundle bundle = getIntent().getExtras();
+        if(bundle!=null){
+            fromLogin = bundle.getBoolean("fromLogin");
+        }
         configCliques();
     }
 
@@ -103,7 +108,10 @@ public class CadastroActivity extends AppCompatActivity {
 
         binding.btnCadastrar.setOnClickListener(v -> validaDados());
 
-        binding.txtLogin.setOnClickListener(v -> finish());
+        binding.txtLogin.setOnClickListener(v -> {
+            if (!fromLogin) startActivity(new Intent(this, LoginActivity.class));
+            finish();
+        });
     }
 
     private void ocultarTeclado() {

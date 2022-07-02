@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation_loja"
-    app:startDestination="@id/menu_pedidos">
+    app:startDestination="@id/menu_pedidos_loja">
 
 
     <fragment
-        android:id="@+id/menu_pedidos"
+        android:id="@+id/menu_pedidos_loja"
         android:name="com.example.ecommerce.fragment.loja.PedidosLojaFragment"
         android:label="fragment_pedidos_loja"
         tools:layout="@layout/fragment_pedidos_loja" />

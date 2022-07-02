@@ -9,7 +9,6 @@ import android.os.Bundle;
 
 import com.example.ecommerce.R;
 import com.example.ecommerce.databinding.ActivityMainUsuarioBinding;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivityUsuario extends AppCompatActivity {
 
@@ -30,13 +29,27 @@ public class MainActivityUsuario extends AppCompatActivity {
             navController = navHostFragment.getNavController();
         }
 
-        NavigationUI.setupWithNavController(binding.bottomNavigationView, navController);
-
-        int id = getIntent().getIntExtra("id", 0);
-        if (id==2){
-            binding.bottomNavigationView.setSelectedItemId(R.id.menu_carrinho);
+        if (navController != null) {
+            NavigationUI.setupWithNavController(binding.bottomNavigationView, navController);
         }
 
+        int id = getIntent().getIntExtra("id", 0);
+
+        redirecionaAcesso(id);
+
+    }
+
+    private void redirecionaAcesso(int id) {
+        switch (id) {
+            case 1:
+                binding.bottomNavigationView.setSelectedItemId(R.id.menu_pedidos);
+                break;
+            case 2:
+                binding.bottomNavigationView.setSelectedItemId(R.id.menu_carrinho);
+                break;
+            default:
+
+        }
     }
 
 

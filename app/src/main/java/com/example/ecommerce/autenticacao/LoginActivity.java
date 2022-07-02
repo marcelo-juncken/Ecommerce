@@ -96,10 +96,10 @@ public class LoginActivity extends AppCompatActivity {
         usuarioRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    startActivity(new Intent(getBaseContext(), MainActivityUsuario.class));
-                } else {
+                if (!snapshot.exists()) {
                     startActivity(new Intent(getBaseContext(), MainActivityLoja.class));
+                }else{
+                    setResult(RESULT_OK);
                 }
                 finish();
             }
@@ -122,6 +122,7 @@ public class LoginActivity extends AppCompatActivity {
         binding.txtCadastro.setOnClickListener(v -> {
             ocultarTeclado();
             Intent intent = new Intent(this, CadastroActivity.class);
+            intent.putExtra("fromLogin", true);
             resultLauncher.launch(intent);
         });
 
