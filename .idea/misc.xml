@@ -58,6 +58,7 @@
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_menos.xml" value="0.3675" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_pagamentos.xml" value="0.251" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_pedidos.xml" value="0.3175" />
+        <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_phone.xml" value="0.1955" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_produtos.xml" value="0.3175" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_resumo.xml" value="0.307" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/drawable/ic_sair.xml" value="0.251" />
@@ -88,6 +89,7 @@
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/activity_splash.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/activity_usuario_endereco.xml" value="0.3087719298245614" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/activity_usuario_form_endereco.xml" value="0.3087719298245614" />
+        <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/activity_usuario_pagamento_pedido.xml" value="0.18070175438596492" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/activity_usuario_perfil.xml" value="0.3087719298245614" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/activity_usuario_resumo_pedido.xml" value="0.3087719298245614" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/activity_usuario_seleciona_endereco.xml" value="0.3087719298245614" />
@@ -99,6 +101,7 @@
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/dialog_form_produto_categoria.xml" value="0.2" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/dialog_item_carrinho.xml" value="0.33" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/dialog_loja_produto.xml" value="0.33" />
+        <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/dialog_status_pedido.xml" value="0.33" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/divisor.xml" value="0.3087719298245614" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/fragment_carrinho_usuario.xml" value="0.3087719298245614" />
         <entry key="..\:/Users/Marcelo/AndroidStudioProjects/Ecommerce/app/src/main/res/layout/fragment_categorias_loja.xml" value="0.18" />

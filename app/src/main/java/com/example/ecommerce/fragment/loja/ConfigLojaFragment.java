@@ -11,10 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.ecommerce.R;
 import com.example.ecommerce.activity.loja.LojaConfigActivity;
 import com.example.ecommerce.activity.loja.LojaPagamentosActivity;
-import com.example.ecommerce.activity.loja.LojaRecebimentosActivity;
 import com.example.ecommerce.activity.usuario.MainActivityUsuario;
 import com.example.ecommerce.databinding.FragmentConfigLojaBinding;
 import com.example.ecommerce.helper.FirebaseHelper;

@@ -58,10 +58,31 @@
                 android:hint="Email"
                 android:inputType="textEmailAddress"
                 android:padding="16dp"
-                app:layout_constraintBottom_toTopOf="@+id/edtSenha"
+                app:layout_constraintBottom_toTopOf="@+id/edtTelefone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/edtNome" />
+
+
+            <com.santalu.maskara.widget.MaskEditText
+                app:mask="(__) _____-____"
+                app:maskCharacter="_"
+                app:maskStyle="completable"
+                android:id="@+id/edtTelefone"
+                android:layout_marginTop="8dp"
+                android:hint="Telefone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_edit_off"
+                android:drawableStart="@drawable/ic_phone"
+                android:drawablePadding="16dp"
+                android:inputType="number"
+                android:padding="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/edtSenha"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
+
 
             <EditText
                 android:id="@+id/edtSenha"
@@ -77,7 +98,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/edtConfirmaSenha"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
+                app:layout_constraintTop_toBottomOf="@+id/edtTelefone" />
 
             <EditText
                 android:id="@+id/edtConfirmaSenha"

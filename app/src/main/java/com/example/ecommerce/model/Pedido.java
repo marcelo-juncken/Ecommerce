@@ -31,7 +31,7 @@ public class Pedido implements Serializable {
     public void salvar(boolean novoPedido) {
         DatabaseReference usuarioPedidoRef = FirebaseHelper.getDatabaseReference()
                 .child("usuarioPedidos")
-                .child(FirebaseHelper.getIdFirebase())
+                .child(getIdCliente())
                 .child(this.getId());
         usuarioPedidoRef.setValue(this);
 
@@ -60,7 +60,6 @@ public class Pedido implements Serializable {
         dataStatusPedidoLojaRef.setValue(ServerValue.TIMESTAMP);
     }
 
-    @Exclude
     public String getId() {
         return id;
     }

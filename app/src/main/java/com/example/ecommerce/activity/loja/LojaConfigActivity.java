@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.InputType;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -22,8 +23,6 @@ import com.example.ecommerce.databinding.ActivityLojaConfigBinding;
 import com.example.ecommerce.helper.FirebaseHelper;
 import com.example.ecommerce.helper.GetMask;
 import com.example.ecommerce.model.Loja;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,8 +31,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.normal.TedPermission;
-import com.santalu.maskara.widget.MaskEditText;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -63,13 +60,27 @@ public class LojaConfigActivity extends AppCompatActivity {
         binding.cvLoja.setOnClickListener(v -> verificaPermissaoGaleria());
         binding.include.include.ibVoltar.setOnClickListener(v -> finish());
 
-
         binding.btnSalvar.setOnClickListener(v -> {
             if (loja != null) {
                 validaDados();
             } else {
                 Toast.makeText(this, "Espere o carregamento da página", Toast.LENGTH_SHORT).show();
             }
+        });
+
+
+        binding.imgShow.setOnClickListener(v -> {
+            binding.edtAccessToken.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            binding.edtAccessToken.setSelection(binding.edtAccessToken.getText().length());
+            binding.imgShow.setVisibility(View.GONE);
+            binding.imgHide.setVisibility(View.VISIBLE);
+        });
+
+        binding.imgHide.setOnClickListener(v -> {
+            binding.edtAccessToken.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            binding.edtAccessToken.setSelection(binding.edtAccessToken.getText().length());
+            binding.imgShow.setVisibility(View.VISIBLE);
+            binding.imgHide.setVisibility(View.GONE);
         });
     }
 
@@ -113,6 +124,11 @@ public class LojaConfigActivity extends AppCompatActivity {
             binding.edtCNPJ.setText(loja.getCNPJ());
         }
 
+        binding.edtPublicKey.setText(loja.getPublicKey());
+        binding.edtAccessToken.setText(loja.getAccessToken());
+        if (loja.getParcelas() != 0) {
+            binding.edtParcelas.setText(String.valueOf(loja.getParcelas()));
+        }
         statusButton(true);
     }
 
@@ -122,30 +138,55 @@ public class LojaConfigActivity extends AppCompatActivity {
         double frete = (double) binding.edtFrete.getRawValue() / 100;
         double pedidoMinimo = (double) binding.edtPedidoMinimo.getRawValue() / 100;
 
+        String publicKey = binding.edtPublicKey.getText().toString().trim();
+        String accessToken = binding.edtAccessToken.getText().toString().trim();
+        String parcelasStr = binding.edtParcelas.getText().toString().trim();
+
+        int parcelas = 0;
+        if (!parcelasStr.isEmpty()) {
+            parcelas = Integer.parseInt(parcelasStr);
+        }
+
         if (!nomeLoja.isEmpty()) {
             if (!CNPJ.isEmpty()) {
                 if (CNPJ.replace("_", "").replace(".", "").replace("/", "").replace("-", "").length() == 14) {
+                    if (!publicKey.isEmpty()) {
+                        if (!accessToken.isEmpty()) {
+                            if (parcelas >= 1 && parcelas <= 12) {
+                                ocultarTeclado();
 
-                    ocultarTeclado();
+                                if (caminhoImagem == null && loja.getUrlLogo() == null) {
+                                    Toast.makeText(this, "Escolha uma imagem para a logo da loja", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    statusButton(false);
 
-                    if (caminhoImagem == null && loja.getUrlLogo() == null) {
-                        Toast.makeText(this, "Escolha uma imagem para a logo da loja", Toast.LENGTH_SHORT).show();
-                    } else {
-                        statusButton(false);
+                                    loja.setNome(nomeLoja);
+                                    loja.setCNPJ(CNPJ);
+                                    loja.setFreteGratis(frete);
+                                    loja.setPedidoMinimo(pedidoMinimo);
+                                    loja.setPublicKey(publicKey);
+                                    loja.setAccessToken(accessToken);
+                                    loja.setParcelas(parcelas);
 
-                        loja.setNome(nomeLoja);
-                        loja.setCNPJ(CNPJ);
-                        loja.setFreteGratis(frete);
-                        loja.setPedidoMinimo(pedidoMinimo);
-
-                        if (caminhoImagem != null) {
-                            salvarLogo();
+                                    if (caminhoImagem != null) {
+                                        salvarLogo();
+                                    } else {
+                                        loja.salvar();
+                                        statusButton(true);
+                                    }
+                                }
+                            } else {
+                                binding.edtParcelas.requestFocus();
+                                binding.edtParcelas.setError("A parcela deve ser um número inteiro entre 1 e 12");
+                            }
                         } else {
-                            loja.salvar();
-                            statusButton(true);
+                            binding.edtAccessToken.requestFocus();
+                            binding.edtAccessToken.setError("Informe o Access Token");
                         }
+                    } else {
+                        binding.edtPublicKey.requestFocus();
+                        binding.edtPublicKey.setError("Informe a Public Key");
                     }
-
                 } else {
                     binding.edtCNPJ.requestFocus();
                     binding.edtCNPJ.setError("CNPJ inválido.");

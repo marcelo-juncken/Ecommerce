@@ -1,22 +1,19 @@
 package com.example.ecommerce.activity.app;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-
+import com.example.ecommerce.R;
 import com.example.ecommerce.activity.loja.MainActivityLoja;
 import com.example.ecommerce.activity.usuario.MainActivityUsuario;
-import com.example.ecommerce.R;
-import com.example.ecommerce.autenticacao.LoginActivity;
 import com.example.ecommerce.helper.FirebaseHelper;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

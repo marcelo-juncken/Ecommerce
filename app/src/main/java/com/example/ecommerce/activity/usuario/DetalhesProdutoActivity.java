@@ -64,15 +64,15 @@ public class DetalhesProdutoActivity extends AppCompatActivity implements Adapte
         itemPedidoDAO = new ItemPedidoDAO(this);
 
         recuperaCategorias();
-
+        configRv();
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             produtoSelecionado = (Produto) bundle.getSerializable("produtoSelecionado");
             configProduto();
         }
         configCliques();
-        recuperaProdutos();
-        configRv();
+        recuperaProdutos(() -> adapterProduto.notifyDataSetChanged());
+
 
     }
 
@@ -137,7 +137,7 @@ public class DetalhesProdutoActivity extends AppCompatActivity implements Adapte
         }
     }
 
-    private void recuperaProdutos() {
+    private void recuperaProdutos(FireBaseCallback myCallback) {
         DatabaseReference produtosRef = FirebaseHelper.getDatabaseReference()
                 .child("produtos");
         produtosRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -145,7 +145,9 @@ public class DetalhesProdutoActivity extends AppCompatActivity implements Adapte
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 produtoList.clear();
                 if (snapshot.exists()) {
+                    long childrenCount = snapshot.getChildrenCount();
                     for (DataSnapshot ds : snapshot.getChildren()) {
+                        childrenCount -= 1;
                         Produto produto = ds.getValue(Produto.class);
                         if (produto != null) {
                             for (String categoria : produtoSelecionado.getIdCategorias().keySet()) {
@@ -156,7 +158,9 @@ public class DetalhesProdutoActivity extends AppCompatActivity implements Adapte
                                     }
                                 }
                             }
-
+                        }
+                        if (childrenCount == 0 ){
+                            myCallback.onCallback();
                         }
                     }
                 } else {
@@ -172,6 +176,9 @@ public class DetalhesProdutoActivity extends AppCompatActivity implements Adapte
         });
     }
 
+    public interface FireBaseCallback {
+        void onCallback();
+    }
 
     private void configRv() {
         binding.rvProdutos.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));

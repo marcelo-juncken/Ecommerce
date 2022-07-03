@@ -74,4 +74,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     // RetroFit https://square.github.io/retrofit/
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    // https://github.com/mercadopago/px-android
+    implementation 'com.mercadopago.android.px:checkout:4.53.1'
 }

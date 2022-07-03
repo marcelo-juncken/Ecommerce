@@ -119,10 +119,6 @@ public class CarrinhoUsuarioFragment extends Fragment implements AdapterCarrinho
         binding.rvProdutos.setAdapter(adapterCarrinho);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 
     @Override
     public void onClick(int position, String operacao) {

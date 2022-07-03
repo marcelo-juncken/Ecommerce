@@ -28,7 +28,7 @@ public class CadastroActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         Bundle bundle = getIntent().getExtras();
-        if(bundle!=null){
+        if (bundle != null) {
             fromLogin = bundle.getBoolean("fromLogin");
         }
         configCliques();
@@ -37,38 +37,50 @@ public class CadastroActivity extends AppCompatActivity {
     private void validaDados() {
         String nome = binding.edtNome.getText().toString().trim();
         String email = binding.edtEmail.getText().toString().trim();
+        String telefone = binding.edtTelefone.getText().toString().trim();
         String senha = binding.edtSenha.getText().toString().trim();
         String confirmasenha = binding.edtConfirmaSenha.getText().toString().trim();
 
         if (!nome.isEmpty()) {
             if (!email.isEmpty()) {
-                if (!senha.isEmpty()) {
-                    if (!confirmasenha.isEmpty()) {
-                        if (confirmasenha.equals(senha)) {
+                if (!telefone.isEmpty()) {
+                    if (telefone.replace("_", "").replace("-", "").replace("(", "").replace(")", "").replace(" ", "").length() == 11) {
+                        if (!senha.isEmpty()) {
+                            if (!confirmasenha.isEmpty()) {
+                                if (confirmasenha.equals(senha)) {
 
-                            ocultarTeclado();
-                            binding.progressBar.setVisibility(View.VISIBLE);
-                            binding.btnCadastrar.setEnabled(false);
+                                    ocultarTeclado();
+                                    binding.progressBar.setVisibility(View.VISIBLE);
+                                    binding.btnCadastrar.setEnabled(false);
 
-                            Usuario usuario = new Usuario();
-                            usuario.setNome(nome);
-                            usuario.setEmail(email);
-                            usuario.setSenha(senha);
+                                    Usuario usuario = new Usuario();
+                                    usuario.setNome(nome);
+                                    usuario.setEmail(email);
+                                    usuario.setTelefone(telefone);
+                                    usuario.setSenha(senha);
 
-                            criarConta(usuario);
+                                    criarConta(usuario);
 
+                                } else {
+                                    binding.edtConfirmaSenha.requestFocus();
+                                    binding.edtSenha.setError("As senhas não batem.");
+                                    binding.edtConfirmaSenha.setError("As senhas não batem.");
+                                }
+                            } else {
+                                binding.edtConfirmaSenha.requestFocus();
+                                binding.edtConfirmaSenha.setError("Confirme sua senha.");
+                            }
                         } else {
-                            binding.edtConfirmaSenha.requestFocus();
-                            binding.edtSenha.setError("As senhas não batem.");
-                            binding.edtConfirmaSenha.setError("As senhas não batem.");
+                            binding.edtSenha.requestFocus();
+                            binding.edtSenha.setError("Digite uma senha.");
                         }
                     } else {
-                        binding.edtConfirmaSenha.requestFocus();
-                        binding.edtConfirmaSenha.setError("Confirme sua senha.");
+                        binding.edtTelefone.requestFocus();
+                        binding.edtTelefone.setError("Telefone inválido.");
                     }
                 } else {
-                    binding.edtSenha.requestFocus();
-                    binding.edtSenha.setError("Digite uma senha.");
+                    binding.edtTelefone.requestFocus();
+                    binding.edtTelefone.setError("Esse campo não pode estar em branco.");
                 }
             } else {
                 binding.edtEmail.requestFocus();

@@ -14,7 +14,6 @@ import com.example.ecommerce.model.Pedido;
 public class DetalhesPedidoActivity extends AppCompatActivity {
 
     private ActivityDetalhesPedidoBinding binding;
-    private AdapterUsuarioDetalhePedidos adapterUsuarioDetalhePedidos;
 
     private Pedido pedido;
 
@@ -55,7 +54,7 @@ public class DetalhesPedidoActivity extends AppCompatActivity {
     }
 
     private void configPagamento() {
-        double valorExtra = 0;
+        double valorExtra;
         double totalPedido = pedido.getTotal();
         double frete = 0;
 
@@ -88,7 +87,7 @@ public class DetalhesPedidoActivity extends AppCompatActivity {
     private void configRv() {
         binding.rvProdutos.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         binding.rvProdutos.setHasFixedSize(true);
-        adapterUsuarioDetalhePedidos = new AdapterUsuarioDetalhePedidos(pedido.getItemPedidoList(), getBaseContext());
+        AdapterUsuarioDetalhePedidos adapterUsuarioDetalhePedidos = new AdapterUsuarioDetalhePedidos(pedido.getItemPedidoList(), getBaseContext());
         binding.rvProdutos.setAdapter(adapterUsuarioDetalhePedidos);
     }
 
